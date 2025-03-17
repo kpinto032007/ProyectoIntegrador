@@ -35,5 +35,19 @@ public class Conexion {
             return false;
         }
     }
+    public static boolean validarUsuario(String usuario, String password) {
+        String sql = "SELECT * FROM tb_usuarios WHERE usuario = ? AND password = ?";
+
+        try (Connection cn = conectar(); PreparedStatement pst = cn.prepareStatement(sql)) {
+            pst.setString(1, usuario);
+            pst.setString(2, password);
+
+            return pst.executeQuery().next(); // Si hay un resultado, el usuario es válido
+        } catch (SQLException e) {
+            System.out.println("❌ Error al validar usuario: " + e.getMessage());
+            return false;
+        }
+    }
+
 
 }

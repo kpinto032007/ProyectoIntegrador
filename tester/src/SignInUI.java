@@ -2,13 +2,17 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class SignInUI {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(SignInUI::createAndShowGUI);
     }
 
-    private static void createAndShowGUI() {
+    static void createAndShowGUI() {
         JFrame frame = new JFrame("Sign In");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 500);
@@ -47,7 +51,7 @@ public class SignInUI {
         rightPanel.add(signInLabel, gbc);
 
         // Campo de usuario
-        JTextField userField = new JTextField("USER. . .");
+        JTextField userField = new JTextField(" ");
         userField.setPreferredSize(new Dimension(200, 30));
         gbc.gridy = 1;
         gbc.gridwidth = 2;
@@ -58,6 +62,9 @@ public class SignInUI {
         passwordField.setPreferredSize(new Dimension(200, 30));
         gbc.gridy = 2;
         rightPanel.add(passwordField, gbc);
+
+        // Mover el foco con Enter
+        userField.addActionListener(e -> passwordField.requestFocusInWindow());
 
         // Enlace de recuperación de contraseña
         JLabel forgotPasswordLabel = new JLabel("¿Forgot your password?");
@@ -71,38 +78,50 @@ public class SignInUI {
         buttonPanel.setOpaque(false);
 
 
+
         // Botón LOGIN
         JButton loginButton = new JButton("LOGIN");
         JButton signupButton = new JButton("SIGN UP");
         buttonPanel.add(loginButton);
         buttonPanel.add(signupButton);
 
+
         gbc.gridy = 4;
         gbc.gridwidth = 2;
         rightPanel.add(buttonPanel, gbc);
 
-        // Acción del botón LOGIN
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String username = userField.getText();
-                String password = new String(passwordField.getPassword());
-                if (username.equals("admin") && password.equals("1234")) {
-                    JOptionPane.showMessageDialog(frame, "Login exitoso", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
+        loginButton.addActionListener(e -> iniciarSesion(userField, passwordField, frame));
 
-        // Acción del botón SIGN UP
-        signupButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(frame, "Funcionalidad de registro no implementada", "Info", JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
 
         frame.setVisible(true);
     }
+
+    private static void iniciarSesion(JTextField userField, JPasswordField passwordField, JFrame frame) {
+        String usuario = userField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
+
+        try (Connection cn = Conexion.conectar();
+             PreparedStatement stmt = cn.prepareStatement("SELECT * FROM tb_usuarios WHERE usuario = ? AND password = ?")) {
+
+            stmt.setString(1, usuario);
+            stmt.setString(2, password);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                JOptionPane.showMessageDialog(frame, "Inicio de sesión exitoso");
+                frame.dispose(); // Cerrar la ventana de inicio
+                new Menu(); // Aquí debes abrir la ventana principal
+            } else {
+                JOptionPane.showMessageDialog(frame, "Usuario o contraseña incorrectos");
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(frame, "Error: " + e.getMessage());
+        }
+    }
+
+
+
+
+
 }
