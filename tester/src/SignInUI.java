@@ -63,8 +63,10 @@ public class SignInUI {
         gbc.gridy = 2;
         rightPanel.add(passwordField, gbc);
 
-        // Mover el foco con Enter
+        // 🔹 Mover el foco con Enter en usuario
         userField.addActionListener(e -> passwordField.requestFocusInWindow());
+        // 🔹 Iniciar sesión con Enter en la contraseña
+        passwordField.addActionListener(e -> iniciarSesion(userField, passwordField, frame));
 
         // Enlace de recuperación de contraseña
         JLabel forgotPasswordLabel = new JLabel("¿Forgot your password?");
@@ -91,6 +93,11 @@ public class SignInUI {
         rightPanel.add(buttonPanel, gbc);
 
         loginButton.addActionListener(e -> iniciarSesion(userField, passwordField, frame));
+        signupButton.addActionListener(e -> {
+            frame.dispose(); // Cierra la ventana de inicio de sesión
+            new FormularioRegistrar(); // Abre la ventana de registro
+        });
+
 
 
         frame.setVisible(true);
@@ -118,6 +125,7 @@ public class SignInUI {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(frame, "Error: " + e.getMessage());
         }
+
     }
 
 
