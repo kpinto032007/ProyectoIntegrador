@@ -29,6 +29,13 @@ public class Menu extends JFrame {
         gbc.gridx = 1; gbc.gridy = 1; add(facturasBtn, gbc);
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2; add(cerrarSesionBtn, gbc);
 
+        // con este abro la de gestionar
+        usuarioBtn.addActionListener(e -> {
+                new gestionarUsuario(); //abre la ventana de gestion de usuarios
+                dispose();//cierra el menu actual
+        });
+
+
         setVisible(true);
     }
 
