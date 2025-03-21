@@ -80,6 +80,10 @@ public class FormularioRegistrar extends JFrame {
         gbc.gridy = 5;
         frame.add(passwordLabel, gbc);
 
+
+
+
+
         JPasswordField passwordField = new JPasswordField();
         gbc.gridx = 1;
         frame.add(passwordField, gbc);
@@ -106,6 +110,10 @@ public class FormularioRegistrar extends JFrame {
                 if (registrarUsuario(nombre, apellido, telefono, usuario, password)) {
                     JOptionPane.showMessageDialog(frame, "Registro exitoso");
                     frame.dispose(); // Cierra la ventana después de registrar
+
+                    //añadi esta "new SignInUI que es con la que abro la de sesión pero para eso necesito un contructor que me inicialice
+                    new SignInUI(); //con esta abro la de inicio de sesión
+
                 } else {
                     JOptionPane.showMessageDialog(frame, "Error al registrar usuario.");
                 }

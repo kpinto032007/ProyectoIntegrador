@@ -11,7 +11,10 @@ public class SignInUI {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(SignInUI::createAndShowGUI);
     }
-
+    //este es el constructor que me inicializa
+    public SignInUI(){
+        createAndShowGUI();
+    }
     static void createAndShowGUI() {
         JFrame frame = new JFrame("Sign In");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -68,6 +71,7 @@ public class SignInUI {
         // 🔹 Iniciar sesión con Enter en la contraseña
         passwordField.addActionListener(e -> iniciarSesion(userField, passwordField, frame));
 
+
         // Enlace de recuperación de contraseña
         JLabel forgotPasswordLabel = new JLabel("¿Forgot your password?");
         forgotPasswordLabel.setFont(new Font("Arial", Font.ITALIC, 12));
@@ -93,12 +97,10 @@ public class SignInUI {
         rightPanel.add(buttonPanel, gbc);
 
         loginButton.addActionListener(e -> iniciarSesion(userField, passwordField, frame));
-        signupButton.addActionListener(e -> {
-            frame.dispose(); // Cierra la ventana de inicio de sesión
-            new FormularioRegistrar(); // Abre la ventana de registro
+        signupButton.addActionListener(e ->{
+            frame.dispose(); // con esta cierro la ventana de sesión
+            new FormularioRegistrar(); //y con esta abro la ventana de registro
         });
-
-
 
         frame.setVisible(true);
     }
@@ -125,10 +127,7 @@ public class SignInUI {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(frame, "Error: " + e.getMessage());
         }
-
     }
-
-
 
 
 
