@@ -4,13 +4,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class Conexion {
-    // Método para conectar a la base de datos
+    //metodo para conectar a la base de datos
     public static Connection conectar() {
         Connection cn = null; // Variable para la conexión
 
         try {
             // Establecer la conexión a MySQL
-            cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bd_sistema_inventario", "root", "karol032007");
+            cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bd_sistema_inventario", "root", "2102");
             System.out.println("Conexión exitosa a la base de datos.");
         } catch (SQLException e) {
             System.out.println("Error en la conexión local: " + e.getMessage());

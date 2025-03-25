@@ -1,44 +1,42 @@
-import javax.swing.*;
+import javax.swing.*;  //crear la ventana
 import java.awt.*;
-import java.sql.Connection;
+import java.sql.Connection;  //conexion y manejar la base de datos
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class FormularioRegistrar extends JFrame {
+public class FormularioRegistrar extends JFrame { //representa una ventana gráfica para registrar nuevos usuarios
 
     public FormularioRegistrar() {
 
-        JFrame frame = new JFrame("Registro de Usuario");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 500);
-        frame.setLocationRelativeTo(null);
-        frame.setLayout(new GridBagLayout());
+        JFrame frame = new JFrame("Registro de Usuario"); //creamos la ventana principal y su titulo
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //si se cierra la ventana, tambien la aplicación
+        frame.setSize(400, 500); //tamaño ancho y alto
+        frame.setLocationRelativeTo(null); //la ventana aparecerá centrada en la pantalla
+        frame.setLayout(new GridBagLayout()); //usamos un diseño flexible en forma de cuadricula (GridBagLayout)
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        GridBagConstraints gbc = new GridBagConstraints(); //aqui configuramos los componentes de la cuadricula
+        gbc.insets = new Insets(10, 10, 10, 10); //espacio entre componentes
+        gbc.fill = GridBagConstraints.HORIZONTAL;  //los componentes ocuparan todoo el ancho disponible
 
-        // Título
-        JLabel titleLabel = new JLabel("Registro de Usuario", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        // ======= TÍTULO DEL FORMULARIO =======
+        JLabel titleLabel = new JLabel("Registro de Usuario", SwingConstants.CENTER); //texto centrado
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18)); //fuente arial, negrita, tamaño 18
+        //posición y tamaño del título en la cuadricula
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        frame.add(titleLabel, gbc);
+        gbc.gridwidth = 2; //ocupa dos columnas
+        frame.add(titleLabel, gbc); //la etiqueta a la ventana
 
-        // Campo Nombre
+        // ======= CAMPO NOMBRE =======
         JLabel nameLabel = new JLabel("Nombre:");
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         frame.add(nameLabel, gbc);
 
-
-        JTextField nameField = new JTextField();
+        JTextField nameField = new JTextField(); //ingresar el nombre
         gbc.gridx = 1;
-        frame.add(nameField, gbc);
-
-
+        frame.add(nameField, gbc); //al campo
 
         // Campo Apellido
         JLabel apellidoLabel = new JLabel("Apellido:");
@@ -80,10 +78,6 @@ public class FormularioRegistrar extends JFrame {
         gbc.gridy = 5;
         frame.add(passwordLabel, gbc);
 
-
-
-
-
         JPasswordField passwordField = new JPasswordField();
         gbc.gridx = 1;
         frame.add(passwordField, gbc);
@@ -97,37 +91,41 @@ public class FormularioRegistrar extends JFrame {
         frame.add(registerButton, gbc);
 
 // Acción del botón
+        //tomamos los valores ingresados y eliminamos espacios
         registerButton.addActionListener(e -> {
             String nombre = nameField.getText().trim();
             String apellido = apellidoField.getText().trim();
             String telefono = telefonoField.getText().trim();
             String usuario = usuarioField.getText().trim();
-            String password = new String(passwordField.getPassword()).trim();
+            String password = new String(passwordField.getPassword()).trim(); //aquí la contraseña está como texto
 
+            //validación: si algun campo está vacio, muestra un mensaje
             if (nombre.isEmpty() || apellido.isEmpty() || telefono.isEmpty() || usuario.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Por favor, completa todos los campos.");
             } else {
+                //aqui llama a la funcion registrar usuario en la base de datos
                 if (registrarUsuario(nombre, apellido, telefono, usuario, password)) {
                     JOptionPane.showMessageDialog(frame, "Registro exitoso");
-                    frame.dispose(); // Cierra la ventana después de registrar
+                    frame.dispose(); //cierra la ventana después de registrar
 
                     //añadi esta "new SignInUI que es con la que abro la de sesión pero para eso necesito un contructor que me inicialice
                     new SignInUI(); //con esta abro la de inicio de sesión
 
-                } else {
+                } else { //
                     JOptionPane.showMessageDialog(frame, "Error al registrar usuario.");
                 }
             }
         });
-
+        //mostramos la ventana
         frame.setVisible(true);
     }
 
-    // Registro base de datos
+    //funcion para guardar en la base de datos
     private static boolean registrarUsuario(String nombre, String apellido, String telefono, String usuario, String password) {
-        String sql = "INSERT INTO tb_usuarios (nombre, apellido, telefono, usuario, password, estado) VALUES (?, ?, ?, ?, ?,?)";
+        String sql = "INSERT INTO tb_usuarios (nombre, apellido, telefono, usuario, password, estado) VALUES (?, ?, ?, ?, ?,?)"; //? proteger contra inyecciones SQL y poner los valores después.
 
-        try (Connection cn = Conexion.conectar(); PreparedStatement pst = cn.prepareStatement(sql)) {
+        try (Connection cn = Conexion.conectar(); PreparedStatement pst = cn.prepareStatement(sql)) { //conectamos a la base de datos usando la clase conexion
+            //llenamos los ? con los datos ingresados por el usuario                                    //preparamos la sentencia SQL para q pueda recibir los valores
             pst.setString(1, nombre);
             pst.setString(2, apellido);
             pst.setString(3, telefono);
@@ -135,9 +133,12 @@ public class FormularioRegistrar extends JFrame {
             pst.setString(5, password);
             pst.setInt(6, 1);  // Estado fijo en 1
 
+            //ejecutamos la inserción y verificamos si se afectó alguna fila
             int filasAfectadas = pst.executeUpdate();
+            //si se insertó correctamente, retorna true
             return filasAfectadas > 0;
         } catch (SQLException e) {
+            //si hay error, muestra un mensaje y retorna false
             JOptionPane.showMessageDialog(null, "❌ Error al registrar usuario: " + e.getMessage());
             return false;
         }

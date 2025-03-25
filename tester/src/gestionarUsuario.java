@@ -6,10 +6,12 @@ import java.sql.*;
 public class gestionarUsuario extends JFrame {
     private JTable tablaUsuarios;
     private DefaultTableModel modelo;
+    private JButton btnModificar, btnEliminar;
+    private Connection conn;
 
     public gestionarUsuario() {
         setTitle("Gestión de Usuarios"); //titulo de la ventana
-        setSize(600, 400); //con esta defino eñ tamaño de la ventana en pixeles
+        setSize(600, 400); //con esta defino el tamaño de la ventana en pixeles
         setLocationRelativeTo(null);//con esta centro la ventana de la pantalla
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // y con este cierro solo esta ventana mas no detengo la ejecucion del programa
 
@@ -19,7 +21,7 @@ public class gestionarUsuario extends JFrame {
 
         //aqui creo el modelo de la tabla
         modelo = new DefaultTableModel();
-        modelo.addColumn("ID");
+        modelo.addColumn("IDUsuario");
         modelo.addColumn("Nombre");
         modelo.addColumn("Apellido");
         modelo.addColumn("Teléfono");
@@ -71,5 +73,6 @@ public class gestionarUsuario extends JFrame {
             JOptionPane.showMessageDialog(this, "Error al cargar usuarios: " + e.getMessage());
         }
     }
+    
 
 }
