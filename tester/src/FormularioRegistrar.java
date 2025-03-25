@@ -80,10 +80,6 @@ public class FormularioRegistrar extends JFrame {
         gbc.gridy = 5;
         frame.add(passwordLabel, gbc);
 
-
-
-
-
         JPasswordField passwordField = new JPasswordField();
         gbc.gridx = 1;
         frame.add(passwordField, gbc);
@@ -95,6 +91,23 @@ public class FormularioRegistrar extends JFrame {
         gbc.gridy = 6;
         gbc.gridwidth = 2;
         frame.add(registerButton, gbc);
+
+        // Botón "Volver"
+        JButton volver = new JButton("Volver");
+        gbc.gridx = 0;
+        gbc.gridy = 7; // Debe estar en la siguiente fila
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(10, 0, 0, 0); // Margen superior
+        gbc.anchor = GridBagConstraints.CENTER; // Centrar el botón
+
+        frame.add(volver, gbc);
+
+        volver.addActionListener(e -> {
+            frame.dispose(); // Cierra la ventana actual
+            new SignInUI();  // Abre la ventana de inicio de sesión
+        });
+
+
 
 // Acción del botón
         registerButton.addActionListener(e -> {

@@ -53,11 +53,11 @@ public class gestionarUsuario extends JFrame {
     private void cargarUsuarios() {
         try (Connection cn = Conexion.conectar();
              Statement stmt = cn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT id, nombre, apellido, telefono, usuario, estado FROM tb_usuarios")) {
+             ResultSet rs = stmt.executeQuery("SELECT idUsuario, nombre, apellido, telefono, usuario, estado FROM tb_usuarios")) {
 
             while (rs.next()) {
                 Object[] fila = {
-                        rs.getInt("id"),
+                        rs.getInt("idUsuario"),
                         rs.getString("nombre"),
                         rs.getString("apellido"),
                         rs.getString("telefono"),
