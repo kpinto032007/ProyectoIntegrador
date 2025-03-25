@@ -90,6 +90,23 @@ public class FormularioRegistrar extends JFrame { //representa una ventana gráf
         gbc.gridwidth = 2;
         frame.add(registerButton, gbc);
 
+        // Botón "Volver"
+        JButton volver = new JButton("Volver");
+        gbc.gridx = 0;
+        gbc.gridy = 7; // Debe estar en la siguiente fila
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(10, 0, 0, 0); // Margen superior
+        gbc.anchor = GridBagConstraints.CENTER; // Centrar el botón
+
+        frame.add(volver, gbc);
+
+        volver.addActionListener(e -> {
+            frame.dispose(); // Cierra la ventana actual
+            new SignInUI();  // Abre la ventana de inicio de sesión
+        });
+
+
+
 // Acción del botón
         //tomamos los valores ingresados y eliminamos espacios
         registerButton.addActionListener(e -> {
@@ -138,8 +155,12 @@ public class FormularioRegistrar extends JFrame { //representa una ventana gráf
             //si se insertó correctamente, retorna true
             return filasAfectadas > 0;
         } catch (SQLException e) {
+<<<<<<< HEAD
             //si hay error, muestra un mensaje y retorna false
             JOptionPane.showMessageDialog(null, "❌ Error al registrar usuario: " + e.getMessage());
+=======
+            JOptionPane.showMessageDialog(null, " Error al registrar usuario: " + e.getMessage());
+>>>>>>> 674cb00b29310b3f4af47b5185824e12f05a6afc
             return false;
         }
     }

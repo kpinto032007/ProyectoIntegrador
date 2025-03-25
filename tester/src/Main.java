@@ -6,6 +6,7 @@ public class Main {
         Conexion.conectar();
 
         // Iniciar la interfaz gráfica
-        SwingUtilities.invokeLater(SignInUI::createAndShowGUI);
+        SwingUtilities.invokeLater(SignInUI::new);
+
     }
 }

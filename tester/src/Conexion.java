@@ -4,7 +4,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class Conexion {
+<<<<<<< HEAD
     //metodo para conectar a la base de datos
+=======
+    // Metodo de conexion con base de datos
+>>>>>>> 674cb00b29310b3f4af47b5185824e12f05a6afc
     public static Connection conectar() {
         Connection cn = null; // Variable para la conexión
 
