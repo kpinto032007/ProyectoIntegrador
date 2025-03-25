@@ -8,14 +8,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SignInUI {
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(SignInUI::createAndShowGUI);
-    }
+
     //este es el constructor que me inicializa
     public SignInUI(){
         createAndShowGUI();
     }
-    static void createAndShowGUI() {
+    public void createAndShowGUI() {
         JFrame frame = new JFrame("Sign In");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 500);
@@ -105,7 +103,7 @@ public class SignInUI {
         frame.setVisible(true);
     }
 
-    private static void iniciarSesion(JTextField userField, JPasswordField passwordField, JFrame frame) {
+    private void iniciarSesion(JTextField userField, JPasswordField passwordField, JFrame frame) {
         String usuario = userField.getText().trim();
         String password = new String(passwordField.getPassword()).trim();
 

@@ -151,7 +151,7 @@ public class FormularioRegistrar extends JFrame {
             int filasAfectadas = pst.executeUpdate();
             return filasAfectadas > 0;
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "❌ Error al registrar usuario: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, " Error al registrar usuario: " + e.getMessage());
             return false;
         }
     }
