@@ -5,7 +5,8 @@ public class Main {
         // Verificar conexión con la base de datos
         Conexion.conectar();
 
-        // Iniciar la interfaz gráfica con la ventana de inicio de sesión
-        SwingUtilities.invokeLater(() -> new SignInUI());
+        // Iniciar la interfaz gráfica
+        SwingUtilities.invokeLater(SignInUI::new);
+
     }
 }

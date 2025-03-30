@@ -46,6 +46,11 @@ public class Menu extends JFrame {
             dispose();//cierra el menu actual
         });
 
+        productoBtn.addActionListener(e -> { //abro crear producto
+            new  CrearProducto();
+            dispose();
+        });
+
         // Acción para el botón FACTURAS
         facturasBtn.addActionListener(e -> {
             String[] opciones = {"Crear Factura", "Gestionar Facturas", "Cancelar"};

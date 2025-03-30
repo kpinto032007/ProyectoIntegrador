@@ -4,13 +4,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class Conexion {
-
+    // Metodo de conexion con base de datos
     public static Connection conectar() {
         Connection cn = null; // Variable para la conexión
 
         try {
             // Establecer la conexión a MySQL
-            cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bd_sistema_inventario", "root", "2102");
+            cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bd_sistema_inventario", "root", "karol032007");
             System.out.println("Conexión exitosa a la base de datos.");
         } catch (SQLException e) {
             System.out.println("Error en la conexión local: " + e.getMessage());
@@ -31,7 +31,7 @@ public class Conexion {
             int filasAfectadas = pst.executeUpdate();
             return filasAfectadas > 0;
         } catch (SQLException e) {
-            System.out.println("Error al registrar usuario: " + e.getMessage());
+            System.out.println(" Error al registrar usuario: " + e.getMessage());
             return false;
         }
     }

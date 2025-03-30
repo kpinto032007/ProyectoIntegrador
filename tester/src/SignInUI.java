@@ -9,21 +9,21 @@ import java.sql.SQLException;
 
 public class SignInUI {
 
-    //este es el constructor que me inicializa
+    //este es el constructor que  inicializa
     public SignInUI(){
         createAndShowGUI();
     }
     public void createAndShowGUI() {
         JFrame frame = new JFrame("Sign In");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 500);
-        frame.setLocationRelativeTo(null);
-        frame.setLayout(new BorderLayout());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  // cierra la pestaña
+        frame.setSize(500, 500);  //establece el tamaño de la interfaz
+        frame.setLocationRelativeTo(null);           //la ubica al centro
+        frame.setLayout(new BorderLayout()); //divide en 5 areas
 
         // Panel izquierdo con color celeste
         JPanel leftPanel = new JPanel();
         leftPanel.setBackground(new Color(173, 216, 230));
-        leftPanel.setPreferredSize(new Dimension(200, frame.getHeight()));
+        leftPanel.setPreferredSize(new Dimension(200, frame.getHeight())); //para completar la pantalla
         leftPanel.setLayout(new GridBagLayout());
         frame.add(leftPanel, BorderLayout.WEST);
 
@@ -37,6 +37,7 @@ public class SignInUI {
         rightPanel.setBackground(new Color(25, 55, 75));
         rightPanel.setLayout(new GridBagLayout());
         frame.add(rightPanel, BorderLayout.CENTER);
+
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -115,7 +116,7 @@ public class SignInUI {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                JOptionPane.showMessageDialog(frame, "Inicio de sesión exitoso");
+
                 frame.dispose(); // Cerrar la ventana de inicio
                 new Menu(); // Aquí debes abrir la ventana principal
             } else {
@@ -126,5 +127,7 @@ public class SignInUI {
             JOptionPane.showMessageDialog(frame, "Error: " + e.getMessage());
         }
     }
+
+
 
 }
