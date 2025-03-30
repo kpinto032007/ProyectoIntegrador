@@ -1,6 +1,6 @@
-import javax.swing.*;  //crear la ventana
+import javax.swing.*;
 import java.awt.*;
-import java.sql.Connection;  //conexion y manejar la base de datos
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -8,19 +8,19 @@ public class FormularioRegistrar extends JFrame { //representa una ventana gráf
 
     public FormularioRegistrar() {
 
-        JFrame frame = new JFrame("Registro de Usuario"); //creamos la ventana principal y su titulo
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //si se cierra la ventana, tambien la aplicación
-        frame.setSize(400, 500); //tamaño ancho y alto
-        frame.setLocationRelativeTo(null); //la ventana aparecerá centrada en la pantalla
+        JFrame frame = new JFrame("Registro de Usuario");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 500);
+        frame.setLocationRelativeTo(null);
         frame.setLayout(new GridBagLayout()); //usamos un diseño flexible en forma de cuadricula (GridBagLayout)
 
         GridBagConstraints gbc = new GridBagConstraints(); //aqui configuramos los componentes de la cuadricula
-        gbc.insets = new Insets(10, 10, 10, 10); //espacio entre componentes
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;  //los componentes ocuparan todoo el ancho disponible
 
         // ======= TÍTULO DEL FORMULARIO =======
-        JLabel titleLabel = new JLabel("Registro de Usuario", SwingConstants.CENTER); //texto centrado
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18)); //fuente arial, negrita, tamaño 18
+        JLabel titleLabel = new JLabel("Registro de Usuario", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         //posición y tamaño del título en la cuadricula
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -98,14 +98,12 @@ public class FormularioRegistrar extends JFrame { //representa una ventana gráf
         gbc.insets = new Insets(10, 0, 0, 0); // Margen superior
         gbc.anchor = GridBagConstraints.CENTER; // Centrar el botón
 
-        frame.add(volver, gbc);
+        frame.add(volver, gbc); //a la ventana
 
         volver.addActionListener(e -> {
             frame.dispose(); // Cierra la ventana actual
             new SignInUI();  // Abre la ventana de inicio de sesión
         });
-
-
 
 // Acción del botón
         //tomamos los valores ingresados y eliminamos espacios
@@ -125,7 +123,6 @@ public class FormularioRegistrar extends JFrame { //representa una ventana gráf
                     JOptionPane.showMessageDialog(frame, "Registro exitoso");
                     frame.dispose(); //cierra la ventana después de registrar
 
-                    //añadi esta "new SignInUI que es con la que abro la de sesión pero para eso necesito un contructor que me inicialice
                     new SignInUI(); //con esta abro la de inicio de sesión
 
                 } else { //
@@ -140,9 +137,9 @@ public class FormularioRegistrar extends JFrame { //representa una ventana gráf
     //funcion para guardar en la base de datos
     private static boolean registrarUsuario(String nombre, String apellido, String telefono, String usuario, String password) {
         String sql = "INSERT INTO tb_usuarios (nombre, apellido, telefono, usuario, password, estado) VALUES (?, ?, ?, ?, ?,?)"; //? proteger contra inyecciones SQL y poner los valores después.
-
-        try (Connection cn = Conexion.conectar(); PreparedStatement pst = cn.prepareStatement(sql)) { //conectamos a la base de datos usando la clase conexion
-            //llenamos los ? con los datos ingresados por el usuario                                    //preparamos la sentencia SQL para q pueda recibir los valores
+                                                                                                            //son marcadores de posición para datos que se asignarán después
+        try (Connection cn = Conexion.conectar(); PreparedStatement pst = cn.prepareStatement(sql)) { //preparamos la sentencia SQL para q pueda recibir los valores
+            //llenamos los ? con los datos ingresados por el usuario
             pst.setString(1, nombre);
             pst.setString(2, apellido);
             pst.setString(3, telefono);
@@ -155,12 +152,9 @@ public class FormularioRegistrar extends JFrame { //representa una ventana gráf
             //si se insertó correctamente, retorna true
             return filasAfectadas > 0;
         } catch (SQLException e) {
-<<<<<<< HEAD
             //si hay error, muestra un mensaje y retorna false
             JOptionPane.showMessageDialog(null, "❌ Error al registrar usuario: " + e.getMessage());
-=======
-            JOptionPane.showMessageDialog(null, " Error al registrar usuario: " + e.getMessage());
->>>>>>> 674cb00b29310b3f4af47b5185824e12f05a6afc
+
             return false;
         }
     }

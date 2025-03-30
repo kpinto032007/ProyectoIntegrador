@@ -23,20 +23,59 @@ public class Menu extends JFrame {
         JButton cerrarSesionBtn = createButton("CERRAR SESIÓN ▶");
 
         // Posicionar botones en el grid
-        gbc.gridx = 0; gbc.gridy = 0; add(usuarioBtn, gbc);
-        gbc.gridx = 1; gbc.gridy = 0; add(proveedoresBtn, gbc);
-        gbc.gridx = 0; gbc.gridy = 1; add(productoBtn, gbc);
-        gbc.gridx = 1; gbc.gridy = 1; add(facturasBtn, gbc);
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2; add(cerrarSesionBtn, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        add(usuarioBtn, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        add(proveedoresBtn, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        add(productoBtn, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        add(facturasBtn, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        add(cerrarSesionBtn, gbc);
 
         // con este abro la de gestionar
         usuarioBtn.addActionListener(e -> {
-                new gestionarUsuario(); //abre la ventana de gestion de usuarios
-                dispose();//cierra el menu actual
+            new gestionarUsuario(); //abre la ventana de gestion de usuarios
+            dispose();//cierra el menu actual
         });
 
+        // Acción para el botón FACTURAS
+        facturasBtn.addActionListener(e -> {
+            String[] opciones = {"Crear Factura", "Gestionar Facturas", "Cancelar"};
+            int seleccion = JOptionPane.showOptionDialog(
+                    this,
+                    "Seleccione una opción:",
+                    "Gestión de Facturas",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    opciones,
+                    opciones[0]
+            );
+
+            if (seleccion == 0) {
+                new CrearFactura().setVisible(true); // Asegúrate de que esta clase exista
+            } else if (seleccion == 1) {
+                // Aquí puedes abrir la gestión de facturas si ya la tienes
+                JOptionPane.showMessageDialog(this, "La función de gestión de facturas aún está en desarrollo.");
+            }
+        });
+
+        // Cerrar sesión
+        cerrarSesionBtn.addActionListener(e -> {
+            new SignInUI(); // Se llama al constructor, que ya muestra la ventana
+            dispose(); // Cierra el menú actual
+        });
 
         setVisible(true);
+
     }
 
     private JButton createButton(String text) {

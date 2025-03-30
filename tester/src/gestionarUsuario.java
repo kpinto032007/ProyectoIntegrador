@@ -9,20 +9,13 @@ public class gestionarUsuario extends JFrame {
     private JButton btnModificar, btnEliminar;
     private Connection conn;
 
-<<<<<<< HEAD
     public gestionarUsuario() {
-        setTitle("Gestión de Usuarios"); //titulo de la ventana
-        setSize(600, 400); //con esta defino el tamaño de la ventana en pixeles
-        setLocationRelativeTo(null);//con esta centro la ventana de la pantalla
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // y con este cierro solo esta ventana mas no detengo la ejecucion del programa
-=======
-    public gestionarUsuario(){
         setTitle("Gestión de Usuarios");
-        setSize(600,400);
+        setSize(600, 400);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
->>>>>>> 674cb00b29310b3f4af47b5185824e12f05a6afc
+
 
         JPanel panelUsuarios = crearPanelUsuarios();
         add(panelUsuarios, BorderLayout.NORTH);
@@ -65,12 +58,12 @@ public class gestionarUsuario extends JFrame {
         setVisible(true);
     }
 
-    private JPanel crearPanelUsuarios(){
+    private JPanel crearPanelUsuarios() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
         JLabel titulo = new JLabel("Gestión de Usuarios", SwingConstants.CENTER);
-        titulo.setFont(new Font("Arial",Font.BOLD, 20));
+        titulo.setFont(new Font("Arial", Font.BOLD, 20));
         panel.add(titulo, BorderLayout.NORTH);
 
         return panel;
@@ -79,11 +72,11 @@ public class gestionarUsuario extends JFrame {
     private void cargarUsuarios() {
         try (Connection cn = Conexion.conectar();
              Statement stmt = cn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT id, nombre, apellido, telefono, usuario, estado FROM tb_usuarios")) {
+             ResultSet rs = stmt.executeQuery("SELECT IdUsuario, nombre, apellido, telefono, usuario, estado FROM tb_usuarios")) {
 
             while (rs.next()) {
                 Object[] fila = {
-                        rs.getInt("id"),
+                        rs.getInt("IdUsuario"),
                         rs.getString("nombre"),
                         rs.getString("apellido"),
                         rs.getString("telefono"),
@@ -97,7 +90,7 @@ public class gestionarUsuario extends JFrame {
             JOptionPane.showMessageDialog(this, "Error al cargar usuarios: " + e.getMessage());
         }
     }
-    
+
 
     private void editarUsuario() {
         int filaSeleccionada = tablaUsuarios.getSelectedRow();
@@ -116,7 +109,7 @@ public class gestionarUsuario extends JFrame {
 
         if (nuevoNombre != null && nuevoApellido != null && nuevoTelefono != null && nuevoUsuario != null && nuevoEstado != null) {
             try (Connection cn = Conexion.conectar();
-                 PreparedStatement stmt = cn.prepareStatement("UPDATE tb_usuarios SET nombre = ?, apellido = ?, telefono = ?, usuario = ?, estado = ? WHERE id = ?")) {
+                 PreparedStatement stmt = cn.prepareStatement("UPDATE tb_usuarios SET nombre = ?, apellido = ?, telefono = ?, usuario = ?, estado = ? WHERE IdUsuario = ?")) {
                 stmt.setString(1, nuevoNombre);
                 stmt.setString(2, nuevoApellido);
                 stmt.setString(3, nuevoTelefono);
@@ -148,7 +141,7 @@ public class gestionarUsuario extends JFrame {
         int confirmacion = JOptionPane.showConfirmDialog(this, "¿Estás seguro de eliminar este usuario?", "Confirmar", JOptionPane.YES_NO_OPTION);
         if (confirmacion == JOptionPane.YES_OPTION) {
             try (Connection cn = Conexion.conectar();
-                 PreparedStatement stmt = cn.prepareStatement("DELETE FROM tb_usuarios WHERE id = ?")) {
+                 PreparedStatement stmt = cn.prepareStatement("DELETE FROM tb_usuarios WHERE IdUsuario = ?")) {
                 stmt.setInt(1, id);
                 stmt.executeUpdate();
                 modelo.removeRow(filaSeleccionada);
