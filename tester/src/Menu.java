@@ -21,8 +21,7 @@ public class Menu extends JFrame {
         JButton productoBtn = createButton("PRODUCTO");
         JButton facturasBtn = createButton("FACTURAS");
         JButton cerrarSesionBtn = createButton("CERRAR SESIÓN ▶");
-
-        // Posicionar botones en el grid
+// Posicionar botones en el grid
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(usuarioBtn, gbc);
@@ -39,18 +38,41 @@ public class Menu extends JFrame {
         gbc.gridy = 2;
         gbc.gridwidth = 2;
         add(cerrarSesionBtn, gbc);
+        // con este abro la de gestionar
 
-        // Acción para abrir la ventana de gestionar usuarios
+        
         usuarioBtn.addActionListener(e -> {
-            new gestionarUsuario();
-            dispose();
+            dispose();//cierra el menu actual
+            new gestionarUsuario(); //abre la ventana de gestion de usuarios
         });
-
+/*
         // Acción para abrir la ventana de crear producto
         productoBtn.addActionListener(e -> {
             new CrearProducto();
             dispose();
         });
+
+ */
+        productoBtn.addActionListener(e -> {
+            String[] opciones = {"Crear Producto", "Gestionar Producto", "Cancelar"};
+            int seleccion = JOptionPane.showOptionDialog(
+                    this,
+                    "Seleccione una opción:",
+                    "Gestión de Productos",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    opciones,
+                    opciones[0]
+            );
+
+            if (seleccion == 0) {
+                new CrearProducto(); // Abre la ventana para crear productos
+            } else if (seleccion == 1) {
+                new gestionarProducto(); // Abre la ventana para gestionar productos
+            }
+        });
+
 
         // Acción para el botón PROVEEDORES
         proveedoresBtn.addActionListener(e -> {
@@ -85,6 +107,7 @@ public class Menu extends JFrame {
             dispose(); // Cierra el menú actual
         });
 
+
         setVisible(true);
     }
 
@@ -99,4 +122,6 @@ public class Menu extends JFrame {
 
         return button;
     }
+    
+
 }
