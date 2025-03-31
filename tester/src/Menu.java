@@ -40,15 +40,22 @@ public class Menu extends JFrame {
         gbc.gridwidth = 2;
         add(cerrarSesionBtn, gbc);
 
-        // con este abro la de gestionar
+        // Acción para abrir la ventana de gestionar usuarios
         usuarioBtn.addActionListener(e -> {
-            new gestionarUsuario(); //abre la ventana de gestion de usuarios
-            dispose();//cierra el menu actual
+            new gestionarUsuario();
+            dispose();
         });
 
-        productoBtn.addActionListener(e -> { //abro crear producto
-            new  CrearProducto();
+        // Acción para abrir la ventana de crear producto
+        productoBtn.addActionListener(e -> {
+            new CrearProducto();
             dispose();
+        });
+
+        // Acción para el botón PROVEEDORES
+        proveedoresBtn.addActionListener(e -> {
+            new CrearProveedor();
+            // Se abre la interfaz de ingreso de proveedores
         });
 
         // Acción para el botón FACTURAS
@@ -68,7 +75,6 @@ public class Menu extends JFrame {
             if (seleccion == 0) {
                 new CrearFactura().setVisible(true); // Asegúrate de que esta clase exista
             } else if (seleccion == 1) {
-                // Aquí puedes abrir la gestión de facturas si ya la tienes
                 JOptionPane.showMessageDialog(this, "La función de gestión de facturas aún está en desarrollo.");
             }
         });
@@ -80,7 +86,6 @@ public class Menu extends JFrame {
         });
 
         setVisible(true);
-
     }
 
     private JButton createButton(String text) {
@@ -94,6 +99,4 @@ public class Menu extends JFrame {
 
         return button;
     }
-
-
 }
