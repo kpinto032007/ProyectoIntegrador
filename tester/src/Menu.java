@@ -45,14 +45,8 @@ public class Menu extends JFrame {
             dispose();//cierra el menu actual
             new gestionarUsuario(); //abre la ventana de gestion de usuarios
         });
-/*
-        // Acción para abrir la ventana de crear producto
-        productoBtn.addActionListener(e -> {
-            new CrearProducto();
-            dispose();
-        });
 
- */
+
         productoBtn.addActionListener(e -> {
             String[] opciones = {"Crear Producto", "Gestionar Producto", "Cancelar"};
             int seleccion = JOptionPane.showOptionDialog(
@@ -68,8 +62,10 @@ public class Menu extends JFrame {
 
             if (seleccion == 0) {
                 new CrearProducto(); // Abre la ventana para crear productos
+                dispose();
             } else if (seleccion == 1) {
                 new gestionarProducto(); // Abre la ventana para gestionar productos
+                dispose();
             }
         });
 
