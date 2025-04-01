@@ -127,12 +127,12 @@ public class gestionarProducto extends JFrame {
             return;
         }
 
-        int id = (int) modelo.getValueAt(filaSeleccionada, 0);
+        String id = (String) modelo.getValueAt(filaSeleccionada, 0);
         int confirmacion = JOptionPane.showConfirmDialog(this, "¿Estás seguro de eliminar este producto?", "Confirmar", JOptionPane.YES_NO_OPTION);
         if (confirmacion == JOptionPane.YES_OPTION) {
             try (Connection cn = Conexion.conectar();
                  PreparedStatement stmt = cn.prepareStatement("DELETE FROM tb_productos WHERE idProducto = ?")) {
-                stmt.setInt(1, id);
+                stmt.setString(1, id); // Cambia setInt por setString
                 stmt.executeUpdate();
                 modelo.removeRow(filaSeleccionada);
                 JOptionPane.showMessageDialog(this, "Producto eliminado.");

@@ -66,11 +66,11 @@ public class gestionarUsuario extends JFrame {
     private void cargarUsuarios() {
         try (Connection cn = Conexion.conectar(); //llamar a un metodo conectar de la clase conexion que posiblemente devuelte un objeto conection
              Statement stmt = cn.createStatement(); //para sentencias SQL
-             ResultSet rs = stmt.executeQuery("SELECT id, nombre, apellido, telefono, usuario, estado FROM tb_usuarios")){
+             ResultSet rs = stmt.executeQuery("SELECT idUsuario, nombre, apellido, telefono, usuario, estado FROM tb_usuarios")){
             //arriba de este coment se ejecuta una consulta para seleccionar los campos de la tabla en mysql
             while (rs.next()) {
                 Object[] fila = {
-                        rs.getInt("id"),
+                        rs.getInt("idUsuario"),
                         rs.getString("nombre"),
                         rs.getString("apellido"),
                         rs.getString("telefono"),
@@ -92,7 +92,7 @@ public class gestionarUsuario extends JFrame {
             return;
         }
 
-        int id = (int) modelo.getValueAt(filaSeleccionada, 0);
+        int idUsuario = (int) modelo.getValueAt(filaSeleccionada, 0);
         String nuevoNombre = JOptionPane.showInputDialog(this, "Nuevo nombre:", modelo.getValueAt(filaSeleccionada, 1));
         String nuevoApellido = JOptionPane.showInputDialog(this, "Nuevo apellido:", modelo.getValueAt(filaSeleccionada, 2));
         String nuevoTelefono = JOptionPane.showInputDialog(this, "Nuevo teléfono:", modelo.getValueAt(filaSeleccionada, 3));
@@ -102,13 +102,13 @@ public class gestionarUsuario extends JFrame {
 
         if (nuevoNombre != null && nuevoApellido != null && nuevoTelefono != null && nuevoUsuario != null && nuevoEstado != null) {
             try (Connection cn = Conexion.conectar();
-                 PreparedStatement stmt = cn.prepareStatement("UPDATE tb_usuarios SET nombre = ?, apellido = ?, telefono = ?, usuario = ?, estado = ? WHERE id = ?")) {
+                 PreparedStatement stmt = cn.prepareStatement("UPDATE tb_usuarios SET nombre = ?, apellido = ?, telefono = ?, usuario = ?, estado = ? WHERE idUsuario = ?")) {
                 stmt.setString(1, nuevoNombre);
                 stmt.setString(2, nuevoApellido);
                 stmt.setString(3, nuevoTelefono);
                 stmt.setString(4, nuevoUsuario);
                 stmt.setBoolean(5, nuevoEstado.equals("Activo"));
-                stmt.setInt(6, id);
+                stmt.setInt(6, idUsuario);
                 stmt.executeUpdate();
 
                 modelo.setValueAt(nuevoNombre, filaSeleccionada, 1);
@@ -130,12 +130,12 @@ public class gestionarUsuario extends JFrame {
             return;
         }
 
-        int id = (int) modelo.getValueAt(filaSeleccionada, 0);
+        int idUsuario = (int) modelo.getValueAt(filaSeleccionada, 0);
         int confirmacion = JOptionPane.showConfirmDialog(this, "¿Estás seguro de eliminar este usuario?", "Confirmar", JOptionPane.YES_NO_OPTION);
         if (confirmacion == JOptionPane.YES_OPTION) {
             try (Connection cn = Conexion.conectar();
-                 PreparedStatement stmt = cn.prepareStatement("DELETE FROM tb_usuarios WHERE id = ?")) {
-                stmt.setInt(1, id);
+                 PreparedStatement stmt = cn.prepareStatement("DELETE FROM tb_usuarios WHERE idUsuario = ?")) {
+                stmt.setInt(1, idUsuario);
                 stmt.executeUpdate();
                 modelo.removeRow(filaSeleccionada);
                 JOptionPane.showMessageDialog(this, "Usuario eliminado.");

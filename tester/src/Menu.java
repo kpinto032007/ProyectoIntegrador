@@ -47,6 +47,8 @@ public class Menu extends JFrame {
         });
 
 
+
+
         productoBtn.addActionListener(e -> {
             String[] opciones = {"Crear Producto", "Gestionar Producto", "Cancelar"};
             int seleccion = JOptionPane.showOptionDialog(
@@ -72,9 +74,20 @@ public class Menu extends JFrame {
 
         // Acción para el botón PROVEEDORES
         proveedoresBtn.addActionListener(e -> {
-            new CrearProveedor();
-            // Se abre la interfaz de ingreso de proveedores
-        });
+            String[] opciones = {"Crear Proveedor", "Gestionar Proveedor", "Cancelar"};
+            int seleccion = JOptionPane.showOptionDialog(
+                    this,
+                    "Seleccione una opción:",
+                    "Gestión de Usuarios",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    opciones,
+                    opciones[0]
+                    // Se abre la interfaz de ingreso de proveedores
+            );
+
+                });
 
         // Acción para el botón FACTURAS
         facturasBtn.addActionListener(e -> {
