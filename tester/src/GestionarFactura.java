@@ -49,17 +49,12 @@ public class GestionarFactura extends JFrame {
         btnEditar.addActionListener(e -> editarFactura());
         btnEliminar.addActionListener(e -> eliminarFactura());
         btnExportarPDF.addActionListener(e -> exportarPDF());
-        btnVolver.addActionListener(e -> {
-            // Cerrar la ventana actual y volver a la anterior
-            dispose();
-            new Menu();
-        });
-
+        btnVolver.addActionListener(e -> volver());
     }
 
     private void cargarFacturas() {
         try (Connection conn = Conexion.conectar()) {
-            String sql = "SELECT fecha, nombre, precio, cantidad, total_a_pagar, estado FROM tb_facturas";
+            String sql = "SELECT fecha, nombre, precio, cantidad, total_a_pagar FROM tb_facturas";
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
@@ -69,8 +64,7 @@ public class GestionarFactura extends JFrame {
                         rs.getString("nombre"),
                         rs.getDouble("precio"),
                         rs.getInt("cantidad"),
-                        rs.getDouble("total_a_pagar"),
-                        rs.getBoolean("estado") ? "Activo" : "Inactivo"
+                        rs.getDouble("total_a_pagar")
                 });
             }
         } catch (SQLException e) {
@@ -85,11 +79,12 @@ public class GestionarFactura extends JFrame {
             return;
         }
 
-        String fecha = (String) modelo.getValueAt(filaSeleccionada, 1);
-        String nombreProducto = (String) modelo.getValueAt(filaSeleccionada, 2);
-        double precio = (double) modelo.getValueAt(filaSeleccionada, 3);
-        int cantidad = (int) modelo.getValueAt(filaSeleccionada, 4);
-        double total = (double) modelo.getValueAt(filaSeleccionada, 5);
+        // Obtener valores de la tabla con el tipo correcto
+        String fecha = (String) modelo.getValueAt(filaSeleccionada, 0);
+        String nombreProducto = (String) modelo.getValueAt(filaSeleccionada, 1);
+        double precio = (Double) modelo.getValueAt(filaSeleccionada, 2);
+        int cantidad = (Integer) modelo.getValueAt(filaSeleccionada, 3);
+        double total = (Double) modelo.getValueAt(filaSeleccionada, 4);
 
         // Crear un panel de edición
         JPanel panel = new JPanel(new GridLayout(0, 2));
@@ -114,23 +109,24 @@ public class GestionarFactura extends JFrame {
         if (option == JOptionPane.OK_OPTION) {
             // Validar y actualizar la factura
             try (Connection conn = Conexion.conectar()) {
-                String sql = "UPDATE tb_facturas SET fecha = ?, nombre = ?, precio = ?, cantidad = ?, total_a_pagar = ? WHERE IdFactura = ?";
+                String sql = "UPDATE tb_facturas SET fecha = ?, nombre = ?, precio = ?, cantidad = ?, total_a_pagar = ? WHERE fecha = ? AND nombre = ?";
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 stmt.setString(1, tfFecha.getText());
                 stmt.setString(2, tfNombreProducto.getText());
                 stmt.setDouble(3, Double.parseDouble(tfPrecio.getText()));
                 stmt.setInt(4, Integer.parseInt(tfCantidad.getText()));
                 stmt.setDouble(5, Double.parseDouble(tfTotal.getText()));
-
+                stmt.setString(6, fecha); // Fecha original como criterio de actualización
+                stmt.setString(7, nombreProducto); // Nombre del producto como criterio de actualización
 
                 int rowsUpdated = stmt.executeUpdate();
                 if (rowsUpdated > 0) {
                     // Actualizar la tabla con los nuevos valores
-                    modelo.setValueAt(tfFecha.getText(), filaSeleccionada, 1);
-                    modelo.setValueAt(tfNombreProducto.getText(), filaSeleccionada, 2);
-                    modelo.setValueAt(Double.parseDouble(tfPrecio.getText()), filaSeleccionada, 3);
-                    modelo.setValueAt(Integer.parseInt(tfCantidad.getText()), filaSeleccionada, 4);
-                    modelo.setValueAt(Double.parseDouble(tfTotal.getText()), filaSeleccionada, 5);
+                    modelo.setValueAt(tfFecha.getText(), filaSeleccionada, 0);
+                    modelo.setValueAt(tfNombreProducto.getText(), filaSeleccionada, 1);
+                    modelo.setValueAt(Double.parseDouble(tfPrecio.getText()), filaSeleccionada, 2);
+                    modelo.setValueAt(Integer.parseInt(tfCantidad.getText()), filaSeleccionada, 3);
+                    modelo.setValueAt(Double.parseDouble(tfTotal.getText()), filaSeleccionada, 4);
                     JOptionPane.showMessageDialog(this, "Factura actualizada correctamente");
                 } else {
                     JOptionPane.showMessageDialog(this, "Error al actualizar la factura", "Error", JOptionPane.ERROR_MESSAGE);
@@ -141,7 +137,6 @@ public class GestionarFactura extends JFrame {
         }
     }
 
-
     private void eliminarFactura() {
         int filaSeleccionada = tablaFacturas.getSelectedRow();
         if (filaSeleccionada == -1) {
@@ -151,12 +146,14 @@ public class GestionarFactura extends JFrame {
 
         int confirmacion = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar la factura?", "Confirmar", JOptionPane.YES_NO_OPTION);
         if (confirmacion == JOptionPane.YES_OPTION) {
-            int idFactura = (int) modelo.getValueAt(filaSeleccionada, 0);
+            String fecha = (String) modelo.getValueAt(filaSeleccionada, 0);
+            String nombreProducto = (String) modelo.getValueAt(filaSeleccionada, 1);
 
             try (Connection conn = Conexion.conectar()) {
-                String sql = "DELETE FROM tb_facturas WHERE IdFactura = ?";
+                String sql = "DELETE FROM tb_facturas WHERE fecha = ? AND nombre = ?";
                 PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setInt(1, idFactura);
+                stmt.setString(1, fecha);
+                stmt.setString(2, nombreProducto);
                 int rowsAffected = stmt.executeUpdate();
                 if (rowsAffected > 0) {
                     modelo.removeRow(filaSeleccionada);
@@ -170,8 +167,15 @@ public class GestionarFactura extends JFrame {
         }
     }
 
-
     private void exportarPDF() {
         JOptionPane.showMessageDialog(this, "Funcionalidad de exportación a PDF en desarrollo");
     }
+
+    private void volver() {
+        // Cerrar la ventana actual y volver al menú principal
+        dispose();
+        new Menu(); // Asumiendo que existe una clase Menu para el menú principal
+    }
+
+
 }
