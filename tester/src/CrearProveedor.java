@@ -26,11 +26,6 @@ public class CrearProveedor {
                 opciones[0]
         );
 
-        if (seleccion == 0) {
-            mostrarFormulario();
-        } else if (seleccion == 1) {
-            JOptionPane.showMessageDialog(null, "Función de consulta aún en desarrollo.");
-        }
     }
 
     private void mostrarFormulario() {

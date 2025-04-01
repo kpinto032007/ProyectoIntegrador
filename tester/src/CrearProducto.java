@@ -144,7 +144,8 @@ public class CrearProducto extends JFrame {
                     JOptionPane.showMessageDialog(frame, "Registro exitoso");
                     frame.dispose(); // Cierra la ventana después de registrar
 
-                    new SignInUI(); //con esta abro la de inicio de sesión
+
+                    new Menu(); //con esta abro al menú
 
                 } else {
                     JOptionPane.showMessageDialog(frame, "Error al registrar usuario.");

@@ -93,7 +93,8 @@ public class Menu extends JFrame {
             if (seleccion == 0) {
                 new CrearFactura().setVisible(true); // Asegúrate de que esta clase exista
             } else if (seleccion == 1) {
-                JOptionPane.showMessageDialog(this, "La función de gestión de facturas aún está en desarrollo.");
+                new GestionarFactura().setVisible(true);
+                dispose();
             }
         });
 
