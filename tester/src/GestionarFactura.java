@@ -19,7 +19,6 @@ public class GestionarFactura extends JFrame {
 
         // Modelo de la tabla
         modelo = new DefaultTableModel();
-        modelo.addColumn("ID");
         modelo.addColumn("Fecha");
         modelo.addColumn("Nombre Producto");
         modelo.addColumn("Precio");
@@ -60,13 +59,12 @@ public class GestionarFactura extends JFrame {
 
     private void cargarFacturas() {
         try (Connection conn = Conexion.conectar()) {
-            String sql = "SELECT IdFactura, fecha, nombre, precio, cantidad, total_a_pagar, estado FROM tb_facturas";
+            String sql = "SELECT fecha, nombre, precio, cantidad, total_a_pagar, estado FROM tb_facturas";
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 modelo.addRow(new Object[]{
-                        rs.getInt("IdFactura"),
                         rs.getString("fecha"),
                         rs.getString("nombre"),
                         rs.getDouble("precio"),
@@ -87,7 +85,6 @@ public class GestionarFactura extends JFrame {
             return;
         }
 
-        int idFactura = (int) modelo.getValueAt(filaSeleccionada, 0);
         String fecha = (String) modelo.getValueAt(filaSeleccionada, 1);
         String nombreProducto = (String) modelo.getValueAt(filaSeleccionada, 2);
         double precio = (double) modelo.getValueAt(filaSeleccionada, 3);
@@ -124,7 +121,7 @@ public class GestionarFactura extends JFrame {
                 stmt.setDouble(3, Double.parseDouble(tfPrecio.getText()));
                 stmt.setInt(4, Integer.parseInt(tfCantidad.getText()));
                 stmt.setDouble(5, Double.parseDouble(tfTotal.getText()));
-                stmt.setInt(6, idFactura);
+
 
                 int rowsUpdated = stmt.executeUpdate();
                 if (rowsUpdated > 0) {
