@@ -14,7 +14,7 @@ import java.time.LocalDate;
 
         private JTextField txtFecha, txtNombre, txtPrecio, txtCantidad;
         private JTextArea txtDescripcion;
-        private JButton btnGuardar;
+        private JButton btnGuardar, btnVolver;
 
         public CrearFactura() {
             setTitle("Crear Factura");
@@ -64,6 +64,7 @@ import java.time.LocalDate;
             gbc.gridx = 1;
             add(txtPrecio, gbc);
 
+
             // Cantidad
             JLabel lblCantidad = new JLabel("Cantidad:");
             gbc.gridx = 0; gbc.gridy = 4;
@@ -73,10 +74,13 @@ import java.time.LocalDate;
             gbc.gridx = 1;
             add(txtCantidad, gbc);
 
+
             // Botón Guardar
             btnGuardar = new JButton("Guardar Factura");
             gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2;
             add(btnGuardar, gbc);
+
+
 
             // Acción del botón para guardar
             btnGuardar.addActionListener(e -> guardarFactura());

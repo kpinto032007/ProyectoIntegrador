@@ -74,18 +74,7 @@ public class Menu extends JFrame {
 
         // Acción para el botón PROVEEDORES
         proveedoresBtn.addActionListener(e -> {
-            String[] opciones = {"Crear Proveedor", "Gestionar Proveedor", "Cancelar"};
-            int seleccion = JOptionPane.showOptionDialog(
-                    this,
-                    "Seleccione una opción:",
-                    "Gestión de Usuarios",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE,
-                    null,
-                    opciones,
-                    opciones[0]
-                    // Se abre la interfaz de ingreso de proveedores
-            );
+            new CrearProveedor();
 
                 });
 
