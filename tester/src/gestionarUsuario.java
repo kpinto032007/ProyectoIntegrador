@@ -7,17 +7,17 @@ public class gestionarUsuario extends JFrame {
     private JTable tablaUsuarios;
     private DefaultTableModel modelo;
 
-    public gestionarUsuario(){
-        setTitle("Gestión de Usuarios"); //titulo ventana
-        setSize(600,400); // tamaño panel
-        setLocationRelativeTo(null); //centrado
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //quiere decir que cierra solo la ventana mas no el programa
-        setLayout(new BorderLayout()); //divide el espacio en 5 areas
+    public gestionarUsuario() {
+        setTitle("Gestión de Usuarios");
+        setSize(600, 400);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
 
         JPanel panelUsuarios = crearPanelUsuarios();
         add(panelUsuarios, BorderLayout.NORTH);
 
-        modelo = new DefaultTableModel(); //el defaultTableModelpermite manejar los datos de la tabla y facilita agregar, editar o eliminar filas
+        modelo = new DefaultTableModel();
         modelo.addColumn("ID");
         modelo.addColumn("Nombre");
         modelo.addColumn("Apellido");
@@ -25,49 +25,55 @@ public class gestionarUsuario extends JFrame {
         modelo.addColumn("Usuario");
         modelo.addColumn("Estado");
 
-        cargarUsuarios();
+        tablaUsuarios = new JTable(modelo);
+        JScrollPane scrollPane = new JScrollPane(tablaUsuarios);
+        add(scrollPane, BorderLayout.CENTER);
 
-        tablaUsuarios = new JTable(modelo); // creacion de un objeto Jtable usando como parametro el modelo definido con anterioridad
-        JScrollPane scrollPane = new JScrollPane(tablaUsuarios); //el JScrollPane lo que hace es añadir barras de desplazamiento si los datos exceden  el tamaño visible
-        add(scrollPane, BorderLayout.CENTER);// se agrega al panel y pasa a verse como lo importante
-
-
-        JPanel buttonPanel = new JPanel(); //este panel es para organizar los botones
+        JPanel buttonPanel = new JPanel();
         JButton btnEditar = new JButton("Editar Usuario");
         JButton btnEliminar = new JButton("Eliminar Usuario");
-        JButton btnRegresar = new JButton("Regresar al Menú");
+        JButton btnRegresar = new JButton("Volver");
         buttonPanel.add(btnEditar);
         buttonPanel.add(btnEliminar);
         buttonPanel.add(btnRegresar);
-        add(buttonPanel, BorderLayout.SOUTH);//se crean los botones, se añaden a dicho panel y luego de añadirlos simplemente los ubicamos
+        add(buttonPanel, BorderLayout.SOUTH);
 
-        btnEditar.addActionListener(e -> editarUsuario());
-        btnEliminar.addActionListener(e -> eliminarUsuario());
+        cargarUsuarios();
+
+        btnEditar.addActionListener(e -> {
+            System.out.println("Botón de edición presionado");
+            editarUsuario();
+        });
+
+        btnEliminar.addActionListener(e -> {
+            System.out.println("Botón de eliminación presionado");
+            eliminarUsuario();
+        });
+
         btnRegresar.addActionListener(e -> {
             dispose();
             new Menu(); // Asegúrate de que esta línea crea y muestra la ventana del menú principal
         });
 
-
         setVisible(true);
     }
 
-    private JPanel crearPanelUsuarios(){
+    private JPanel crearPanelUsuarios() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
         JLabel titulo = new JLabel("Gestión de Usuarios", SwingConstants.CENTER);
-        titulo.setFont(new Font("Arial",Font.BOLD, 20));
+        titulo.setFont(new Font("Arial", Font.BOLD, 20));
         panel.add(titulo, BorderLayout.NORTH);
 
         return panel;
     }
 
     private void cargarUsuarios() {
-        try (Connection cn = Conexion.conectar(); //llamar a un metodo conectar de la clase conexion que posiblemente devuelte un objeto conection
-             Statement stmt = cn.createStatement(); //para sentencias SQL
-             ResultSet rs = stmt.executeQuery("SELECT idUsuario, nombre, apellido, telefono, usuario, estado FROM tb_usuarios")){
-            //arriba de este coment se ejecuta una consulta para seleccionar los campos de la tabla en mysql
+        try (Connection cn = Conexion.conectar();
+             Statement stmt = cn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT idUsuario, nombre, apellido, telefono, usuario, estado FROM tb_usuarios")) {
+
             while (rs.next()) {
                 Object[] fila = {
                         rs.getInt("idUsuario"),
@@ -80,67 +86,120 @@ public class gestionarUsuario extends JFrame {
                 modelo.addRow(fila);
             }
 
+            System.out.println("Usuarios cargados correctamente. Total: " + modelo.getRowCount());
+
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error al cargar usuarios: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     private void editarUsuario() {
+        System.out.println("Iniciando edición de usuario");
         int filaSeleccionada = tablaUsuarios.getSelectedRow();
         if (filaSeleccionada == -1) {
-            JOptionPane.showMessageDialog(this, "Selecciona un usuario para editar.");
+            JOptionPane.showMessageDialog(this, "Seleccione un usuario para editar", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        int idUsuario = (int) modelo.getValueAt(filaSeleccionada, 0);
-        String nuevoNombre = JOptionPane.showInputDialog(this, "Nuevo nombre:", modelo.getValueAt(filaSeleccionada, 1));
-        String nuevoApellido = JOptionPane.showInputDialog(this, "Nuevo apellido:", modelo.getValueAt(filaSeleccionada, 2));
-        String nuevoTelefono = JOptionPane.showInputDialog(this, "Nuevo teléfono:", modelo.getValueAt(filaSeleccionada, 3));
-        String nuevoUsuario = JOptionPane.showInputDialog(this, "Nuevo usuario:", modelo.getValueAt(filaSeleccionada, 4));
-        String[] estados = {"Activo", "Inactivo"};
-        String nuevoEstado = (String) JOptionPane.showInputDialog(this, "Nuevo estado:", "Estado", JOptionPane.QUESTION_MESSAGE, null, estados, modelo.getValueAt(filaSeleccionada, 5));
+        System.out.println("Fila seleccionada: " + filaSeleccionada);
 
-        if (nuevoNombre != null && nuevoApellido != null && nuevoTelefono != null && nuevoUsuario != null && nuevoEstado != null) {
-            try (Connection cn = Conexion.conectar();
-                 PreparedStatement stmt = cn.prepareStatement("UPDATE tb_usuarios SET nombre = ?, apellido = ?, telefono = ?, usuario = ?, estado = ? WHERE idUsuario = ?")) {
-                stmt.setString(1, nuevoNombre);
-                stmt.setString(2, nuevoApellido);
-                stmt.setString(3, nuevoTelefono);
-                stmt.setString(4, nuevoUsuario);
-                stmt.setBoolean(5, nuevoEstado.equals("Activo"));
-                stmt.setInt(6, idUsuario);
-                stmt.executeUpdate();
+        String nombre = (String) modelo.getValueAt(filaSeleccionada, 1);
+        String apellido = (String) modelo.getValueAt(filaSeleccionada, 2);
+        String telefono = (String) modelo.getValueAt(filaSeleccionada, 3);
+        String usuario = (String) modelo.getValueAt(filaSeleccionada, 4);
+        String estadoStr = (String) modelo.getValueAt(filaSeleccionada, 5);
 
-                modelo.setValueAt(nuevoNombre, filaSeleccionada, 1);
-                modelo.setValueAt(nuevoApellido, filaSeleccionada, 2);
-                modelo.setValueAt(nuevoTelefono, filaSeleccionada, 3);
-                modelo.setValueAt(nuevoUsuario, filaSeleccionada, 4);
-                modelo.setValueAt(nuevoEstado, filaSeleccionada, 5);
-                JOptionPane.showMessageDialog(this, "Usuario actualizado.");
+        // Convertir estado a entero (1 para Activo, 0 para Inactivo)
+        int estado = estadoStr.equals("Activo") ? 1 : 0;
+
+        JPanel panel = new JPanel(new GridLayout(0, 2));
+        JTextField tfNombre = new JTextField(nombre);
+        JTextField tfApellido = new JTextField(apellido);
+        JTextField tfTelefono = new JTextField(telefono);
+        JTextField tfUsuario = new JTextField(usuario);
+        JComboBox<String> cbEstado = new JComboBox<>(new String[]{"Activo", "Inactivo"});
+        cbEstado.setSelectedItem(estadoStr);
+
+        panel.add(new JLabel("Nombre:"));
+        panel.add(tfNombre);
+        panel.add(new JLabel("Apellido:"));
+        panel.add(tfApellido);
+        panel.add(new JLabel("Teléfono:"));
+        panel.add(tfTelefono);
+        panel.add(new JLabel("Usuario:"));
+        panel.add(tfUsuario);
+        panel.add(new JLabel("Estado:"));
+        panel.add(cbEstado);
+
+        int option = JOptionPane.showConfirmDialog(this, panel, "Editar Usuario", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            try (Connection conn = Conexion.conectar()) {
+                String sql = "UPDATE tb_usuarios SET nombre = ?, apellido = ?, telefono = ?, usuario = ?, estado = ? WHERE idUsuario = ?";
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                stmt.setString(1, tfNombre.getText());
+                stmt.setString(2, tfApellido.getText());
+                stmt.setString(3, tfTelefono.getText());
+                stmt.setString(4, tfUsuario.getText());
+                stmt.setInt(5, cbEstado.getSelectedItem().equals("Activo") ? 1 : 0);
+                stmt.setInt(6, (int) modelo.getValueAt(filaSeleccionada, 0));
+
+                int rowsUpdated = stmt.executeUpdate();
+                if (rowsUpdated > 0) {
+                    modelo.setValueAt(tfNombre.getText(), filaSeleccionada, 1);
+                    modelo.setValueAt(tfApellido.getText(), filaSeleccionada, 2);
+                    modelo.setValueAt(tfTelefono.getText(), filaSeleccionada, 3);
+                    modelo.setValueAt(tfUsuario.getText(), filaSeleccionada, 4);
+                    modelo.setValueAt(cbEstado.getSelectedItem(), filaSeleccionada, 5);
+                    JOptionPane.showMessageDialog(this, "Usuario actualizado correctamente");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error al actualizar el usuario", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Error al actualizar usuario: " + e.getMessage());
+                JOptionPane.showMessageDialog(this, "Error al editar el usuario: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
             }
         }
     }
 
     private void eliminarUsuario() {
+        System.out.println("Botón de eliminar usuario presionado");
+
         int filaSeleccionada = tablaUsuarios.getSelectedRow();
         if (filaSeleccionada == -1) {
-            JOptionPane.showMessageDialog(this, "Selecciona un usuario para eliminar.");
+            JOptionPane.showMessageDialog(this, "Seleccione un usuario para eliminar", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
+        System.out.println("Fila seleccionada para eliminar: " + filaSeleccionada);
+
         int idUsuario = (int) modelo.getValueAt(filaSeleccionada, 0);
-        int confirmacion = JOptionPane.showConfirmDialog(this, "¿Estás seguro de eliminar este usuario?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        String nombreUsuario = (String) modelo.getValueAt(filaSeleccionada, 1);
+
+        JPanel panel = new JPanel(new GridLayout(0, 2));
+        panel.add(new JLabel("ID Usuario:"));
+        panel.add(new JLabel(String.valueOf(idUsuario)));
+        panel.add(new JLabel("Nombre:"));
+        panel.add(new JLabel(nombreUsuario));
+
+        int confirmacion = JOptionPane.showConfirmDialog(this, panel, "¿Está seguro de eliminar este usuario?", JOptionPane.YES_NO_OPTION);
         if (confirmacion == JOptionPane.YES_OPTION) {
             try (Connection cn = Conexion.conectar();
                  PreparedStatement stmt = cn.prepareStatement("DELETE FROM tb_usuarios WHERE idUsuario = ?")) {
+
                 stmt.setInt(1, idUsuario);
-                stmt.executeUpdate();
-                modelo.removeRow(filaSeleccionada);
-                JOptionPane.showMessageDialog(this, "Usuario eliminado.");
+
+                int rowsDeleted = stmt.executeUpdate();
+                if (rowsDeleted > 0) {
+                    modelo.removeRow(filaSeleccionada);
+                    JOptionPane.showMessageDialog(this, "Usuario eliminado correctamente");
+                    System.out.println("Usuario eliminado: ID " + idUsuario);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error al eliminar el usuario", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Error al eliminar usuario: " + e.getMessage());
+                JOptionPane.showMessageDialog(this, "Error al eliminar usuario: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
             }
         }
     }
