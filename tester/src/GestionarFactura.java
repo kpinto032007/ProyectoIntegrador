@@ -16,6 +16,7 @@ public class GestionarFactura extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
+        setVisible(true);
 
         // Modelo de la tabla
         modelo = new DefaultTableModel();
@@ -36,10 +37,12 @@ public class GestionarFactura extends JFrame {
         btnExportarPDF = new JButton("Exportar PDF");
         btnVolver = new JButton("Volver");
 
+
         panelBotones.add(btnEditar);
         panelBotones.add(btnEliminar);
         panelBotones.add(btnExportarPDF);
         panelBotones.add(btnVolver);
+
 
         add(panelBotones, BorderLayout.SOUTH);
 
@@ -50,6 +53,7 @@ public class GestionarFactura extends JFrame {
         btnEliminar.addActionListener(e -> eliminarFactura());
         btnExportarPDF.addActionListener(e -> exportarPDF());
         btnVolver.addActionListener(e -> volver());
+
     }
 
     private void cargarFacturas() {
@@ -172,10 +176,29 @@ public class GestionarFactura extends JFrame {
     }
 
     private void volver() {
-        // Cerrar la ventana actual y volver al menú principal
         dispose();
-        new Menu(); // Asumiendo que existe una clase Menu para el menú principal
+        new Menu();
+
+        String[] opciones = {"Crear Factura", "Gestionar Facturas", "Cancelar"};
+        int opcion = JOptionPane.showOptionDialog(
+                null,
+                "Seleccione una opción:",
+                "Gestión de Facturas",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                opciones,
+                opciones[0]
+        );
+
+        switch (opcion) {
+            case 0 -> new CrearFactura().setVisible(true);
+            case 1 -> new GestionarFactura().setVisible(true);
+            default -> { }
+        }// Cierra solo esta ventana
+
     }
+
 
 
 }

@@ -80,6 +80,32 @@ import java.time.LocalDate;
             gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2;
             add(btnGuardar, gbc);
 
+            btnVolver = new JButton("Volver");
+            gbc.gridy = 6; gbc.gridx = 0; gbc.gridwidth = 2;
+            add(btnVolver, gbc);
+
+            btnVolver.addActionListener(e -> {
+                dispose();
+
+                String[] opciones = {"Crear Factura", "Gestionar Facturas", "Cancelar"};
+                int opcion = JOptionPane.showOptionDialog(
+                        null,
+                        "Seleccione una opción:",
+                        "Gestión de Facturas",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE,
+                        null,
+                        opciones,
+                        opciones[0]
+                );
+
+                switch (opcion) {
+                    case 0 -> new CrearFactura().setVisible(true);
+                    case 1 -> new GestionarFactura().setVisible(true);
+                    default -> { }
+                }
+            });
+
 
 
             // Acción del botón para guardar
