@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 
-
 public class ConsultarProveedor {
 
     private JFrame frame;
@@ -46,25 +45,27 @@ public class ConsultarProveedor {
         JPanel panelBotones = new JPanel();
         JButton btnMenu = new JButton("Volver al Menú Principal");
         JButton btnAtras = new JButton("Volver Atrás");
+        JButton btnCancelar = new JButton("Cancelar");
 
         btnAtras.addActionListener(e -> {
             frame.dispose();
             new CrearProveedor(); // Vuelve al menú de "Ingresar / Consultar"
         });
 
-        JButton btnCancelar = new JButton("Cancelar");
+        btnMenu.addActionListener(e -> {
+            frame.dispose();
+            new Menu(); // Asegúrate de tener esta clase
+        });
+
         btnCancelar.addActionListener(e -> frame.dispose());
+
         panelBotones.add(btnCancelar);
-
-
         panelBotones.add(btnAtras);
         panelBotones.add(btnMenu);
         frame.add(panelBotones, BorderLayout.SOUTH);
 
         frame.setVisible(true);
     }
-
-
 
     private void cargarDatos() {
         modelo.setRowCount(0); // limpiar tabla

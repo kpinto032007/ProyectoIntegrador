@@ -28,6 +28,6 @@
         <jarDirectory url="file://$USER_HOME$/Downloads/mysql-connector-j-9.2.0 (1)/mysql-connector-j-9.2.0" recursive="false" />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="mysql-connector-java-5.1.46-bin" level="project" />
+    <orderEntry type="library" name="mysql-connector-j-9.3.0" level="project" />
   </component>
 </module>

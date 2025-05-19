@@ -29,7 +29,7 @@ public class CrearProveedor {
             mostrarFormulario();
 
         }else if(seleccion ==1){
-            JOptionPane.showMessageDialog(null, "Funcion de connsulta en desarrolo");
+            new ConsultarProveedor();
         }
     }
 
