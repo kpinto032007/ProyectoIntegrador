@@ -79,6 +79,7 @@ public class Menu extends JFrame {
 
                 });
 
+
         // Acción para el botón FACTURAS
         facturasBtn.addActionListener(e -> {
             String[] opciones = {"Crear Factura", "Gestionar Facturas", "Cancelar"};
