@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
 
 public class Menu extends JFrame {
 
@@ -20,7 +21,7 @@ public class Menu extends JFrame {
         JButton proveedoresBtn = createButton("PROVEEDORES");
         JButton productoBtn = createButton("PRODUCTO");
         JButton facturasBtn = createButton("FACTURAS");
-        JButton cerrarSesionBtn = createButton("CERRAR SESIÓN ▶");
+        JButton cerrarSesionBtn = createButton("CERRAR SESIÓN ");
 // Posicionar botones en el grid
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -46,9 +47,6 @@ public class Menu extends JFrame {
             new gestionarUsuario(); //abre la ventana de gestion de usuarios
         });
 
-
-
-
         productoBtn.addActionListener(e -> {
             String[] opciones = {"Crear Producto", "Gestionar Producto", "Cancelar"};
             int seleccion = JOptionPane.showOptionDialog(
@@ -64,17 +62,34 @@ public class Menu extends JFrame {
 
             if (seleccion == 0) {
                 new CrearProducto(); // Abre la ventana para crear productos
-                dispose();
+
             } else if (seleccion == 1) {
-                new gestionarProducto(); // Abre la ventana para gestionar productos
-                dispose();
+                new gestionarProducto().setVisible(true); // Abre la ventana para gestionar productos
+
             }
         });
 
 
+
         // Acción para el botón PROVEEDORES
         proveedoresBtn.addActionListener(e -> {
-            new CrearProveedor();
+            String[] opciones = {"Crear Proveedor", "Gestionar Proveedores", "Cancelar"};
+            int seleccion = JOptionPane.showOptionDialog(
+                    this,
+                    "Seleccione una Opción:",
+                    "Gestión Proveedores",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    opciones,
+                    opciones[0]
+            );
+            if (seleccion == 0) {
+                new CrearProveedor();// Asegúrate de que esta clase exista poner el set.visible
+            } else if (seleccion == 1) {
+                new gestionarProveedor().setVisible(true);
+            }
+
 
                 });
 
@@ -96,8 +111,7 @@ public class Menu extends JFrame {
             if (seleccion == 0) {
                 new CrearFactura().setVisible(true); // Asegúrate de que esta clase exista
             } else if (seleccion == 1) {
-                new GestionarFactura().setVisible(true);
-                dispose();
+                new gestionarFactura().setVisible(true);
             }
         });
 
@@ -112,16 +126,49 @@ public class Menu extends JFrame {
     }
 
     private JButton createButton(String text) {
-        JButton button = new JButton(text);
+        JButton button = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // Color de fondo con hover
+                Color background = getModel().isRollover() ? new Color(30, 70, 100) : new Color(25, 55, 75);
+                g2.setColor(background);
+
+                // Fondo redondeado
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+
+                super.paintComponent(g);
+                g2.dispose();
+            }
+
+            @Override
+            protected void paintBorder(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(new Color(255, 165, 0)); // Borde naranja
+                g2.setStroke(new BasicStroke(2));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 30, 30);
+            }
+
+            @Override
+            public boolean contains(int x, int y) {
+                // Área clickeable redonda
+                Shape shape = new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 30, 30);
+                return shape.contains(x, y);
+            }
+        };
+
         button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBackground(new Color(25, 55, 75)); // Azul oscuro
         button.setForeground(Color.WHITE);
-        button.setBorder(BorderFactory.createLineBorder(new Color(255, 165, 0), 2)); // Borde naranja
         button.setFocusPainted(false);
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
         button.setPreferredSize(new Dimension(180, 50));
 
         return button;
     }
-    
+
+
 
 }

@@ -1,131 +1,204 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class CrearProveedor {
-    private JFrame frame;
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+
+public class CrearProveedor extends JFrame{
 
     public CrearProveedor() {
-        mostrarMenuSeleccion();
-    }
-
-    private void mostrarMenuSeleccion() {
-        String[] opciones = {"Ingresar Proveedor", "Consultar Proveedor"};
-        int seleccion = JOptionPane.showOptionDialog(
-                null,
-                "Seleccione una opción:",
-                "Gestión de Proveedores",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                opciones,
-                opciones[0]
-        );
-        if (seleccion ==0){
-            mostrarFormulario();
-
-        }else if(seleccion ==1){
-            new ConsultarProveedor();
-        }
-    }
-
-    private void mostrarFormulario() {
-        frame = new JFrame("Ingresar Proveedor");
-        frame.setSize(400, 300);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+       JFrame frame = new JFrame("Crear proveedor");
+        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setSize(400,500);
         frame.setLocationRelativeTo(null);
         frame.setLayout(new GridBagLayout());
-        frame.getContentPane().setBackground(Color.WHITE);
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;//los componentes ocupran todoo el ancho disponible
+        // Título
+        JLabel titleLabel = new JLabel("Crear Proveedor", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        frame.add(new JLabel("Nombre:"), gbc);
-        gbc.gridx = 1;
-        JTextField txtNombre = new JTextField(10);
-        frame.add(txtNombre, gbc);
+        gbc.gridwidth = 2;//ocupa dos columnas
+        frame.add(titleLabel, gbc);
 
+        //Id producto
+        JLabel IdProductoLabel = new JLabel("Id Proveedor:");
         gbc.gridx = 0;
         gbc.gridy = 1;
-        frame.add(new JLabel("Apellido:"), gbc);
-        gbc.gridx = 1;
-        JTextField txtApellido = new JTextField(10);
-        frame.add(txtApellido, gbc);
+        gbc.gridwidth = 1;
+        frame.add(IdProductoLabel, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        frame.add(new JLabel("Cédula:"), gbc);
+        JTextField IdField = new JTextField(15); //ingresar el id
         gbc.gridx = 1;
-        JTextField txtCedula = new JTextField(10);
-        frame.add(txtCedula, gbc);
+        frame.add(IdField, gbc); // al campo
 
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        frame.add(new JLabel("Teléfono:"), gbc);
-        gbc.gridx = 1;
-        JTextField txtTelefono = new JTextField(10);
-        frame.add(txtTelefono, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        frame.add(new JLabel("Empresa Proveedora:"), gbc);
-        gbc.gridx = 1;
-        JTextField txtEmpresa = new JTextField(10);
-        frame.add(txtEmpresa, gbc);
+        //Nombre
+        JLabel nombreLabel = new JLabel("Nombre: ");
+        gbc.gridx =0;
+        gbc.gridy =2;
+        gbc.gridwidth = 1;
+        frame.add(nombreLabel,gbc);
 
-        JButton btnGuardar = new JButton("Guardar");
-        estiloBoton(btnGuardar);
+
+        JTextField nombreField = new JTextField();
+        gbc.gridx=1;
+        frame.add(nombreField,gbc);
+        IdField.addActionListener(e -> nombreField.requestFocusInWindow());
+
+
+        //Apellido
+        JLabel apellidoLabel= new JLabel("Apellido: ");
+        gbc.gridx= 0;
+        gbc.gridy= 3;
+        gbc.gridwidth =1;
+        frame.add(apellidoLabel,gbc);
+
+        JTextField apellidoField = new JTextField();
+        gbc.gridx= 1;
+        frame.add(apellidoField,gbc);
+        nombreField.addActionListener(e ->apellidoField.requestFocusInWindow());
+
+        //Cedula
+        JLabel cedulaLabel= new JLabel("Cédula: ");
+        gbc.gridx =0;
+        gbc.gridy =4;
+        gbc.gridwidth = 1;
+        frame.add(cedulaLabel,gbc);
+
+
+        JTextField cedulaField = new JTextField();
+        gbc.gridx=1;
+        frame.add(cedulaField,gbc);
+        apellidoField.addActionListener(e -> cedulaField.requestFocusInWindow());
+
+
+        JLabel telefonoLabel = new JLabel("Telefono: ");
         gbc.gridx = 0;
         gbc.gridy = 5;
-        gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.CENTER;
-        frame.add(btnGuardar, gbc);
+        gbc.gridwidth = 1;
+        frame.add(telefonoLabel, gbc);
 
-        JButton btnVolver = new JButton("Volver");
-        estiloBoton(btnVolver);
+        JTextField telefonoField = new JTextField();
+        gbc.gridx=1;
+        frame.add(telefonoField,gbc);
+        cedulaField.addActionListener(e -> telefonoField.requestFocusInWindow());
+
+        //empresa proveedora
+        JLabel empresaLabel = new JLabel("Empresa Proveedora: ");
+        gbc.gridx = 0;
         gbc.gridy = 6;
-        frame.add(btnVolver, gbc);
+        gbc.gridwidth = 1;
+        frame.add(empresaLabel, gbc);
 
-        btnVolver.addActionListener(e -> frame.dispose());
+        JTextField empresaField = new JTextField();
+        gbc.gridx=1;
+        frame.add(empresaField,gbc);
+        telefonoField.addActionListener(e -> empresaField.requestFocusInWindow());
 
-        btnGuardar.addActionListener(e -> {
-            try {
-                Connection conn = Conexion.conectar();
-                if (conn == null) {
-                    JOptionPane.showMessageDialog(frame, "Error: No se pudo conectar a la base de datos.", "Error de conexión", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                String sql = "INSERT INTO tb_proveedores (nombre, apellido, cedula, telefono, empresa_proveedora, estado) VALUES (?, ?, ?, ?, ?, 1)";
-
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setString(1, txtNombre.getText());
-                stmt.setString(2, txtApellido.getText());
-                stmt.setString(3, txtCedula.getText());
-                stmt.setString(4, txtTelefono.getText());
-                stmt.setString(5, txtEmpresa.getText());
-                stmt.executeUpdate();
-                conn.close();
-                JOptionPane.showMessageDialog(frame, "Proveedor guardado correctamente.");
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(frame, "Error al guardar en la base de datos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
 
         frame.setVisible(true);
+
+        // Botón de registro
+        JButton registerButton = new JButton("Registrar");
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.gridwidth = 2;
+        frame.add(registerButton, gbc);
+
+        // Botón "Volver"
+        JButton volver = new JButton("Volver");
+        gbc.gridx = 0;
+        gbc.gridy = 8; // Debe estar en la siguiente fila
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(10, 0, 0, 0); // Margen superior
+        gbc.anchor = GridBagConstraints.CENTER; // Centrar el botón
+        frame.add(volver,gbc);
+
+        volver.addActionListener(e -> {
+            frame.dispose(); // Cierra la ventana actual
+            // Abre la ventana de inicio de sesión
+            String[] opciones= {" Crear proveedor", "Gestionar Proveedor", "Volver"};
+            int opcion = JOptionPane.showOptionDialog(
+                    null,
+                    "Seleccione una opción:",
+                    "Gestión de Proveedor",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    opciones,
+                    opciones[0]
+            );
+            switch (opcion) {
+                case 0 -> new CrearProveedor().setVisible(true);
+                case 1 -> new gestionarProveedor().setVisible(true);
+                default -> { }
+            }
+
+        });
+        registerButton.addActionListener(e -> {
+            String IdProveedor= IdField.getText().trim();
+            String nombre = nombreField.getText().trim();
+            String apellido = apellidoField.getText().trim();
+            String cedula = cedulaField.getText().trim();
+            String telefono = telefonoField.getText().trim();
+            String empresa_proveedora = empresaField.getText().trim();
+
+
+            if (IdProveedor.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || cedula.isEmpty() || telefono.isEmpty() || empresa_proveedora.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Por favor, completa todos los campos.");
+                return;
+            }
+            try {
+                long Cedula = Long.parseLong(cedula);  // Convierte a long
+                long Telefono = Long.parseLong(telefono);
+
+
+                //aqui llama a la funcion registrar usuarioven la base de datos
+                if (CrearProveedor(IdProveedor,nombre,apellido,Cedula,Telefono, empresa_proveedora)) {
+                    JOptionPane.showMessageDialog(frame, "Registro exitoso");
+                   // Cierra la ventana después de registrar
+
+
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Error al registrar usuario.");
+                }
+
+            } catch (NumberFormatException ex) {
+                // Si el usuario ingresa un valor no numérico, muestra un mensaje de error
+                JOptionPane.showMessageDialog(null, "Error: Ingresa solo números en Cedula y Telefono.", "Error de validación", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+    }
+    public static boolean  CrearProveedor(String IdProveedor, String nombre, String apellido, long cedula, long telefono, String empresa_proveedora){
+        String sql = "INSERT INTO tb_proveedores (idProveedor, nombre, apellido, cedula, telefono, empresa_proveedora, estado) VALUES (?, ?, ?, ?, ?,?,?)";
+        //proteger contra inyecciones sql y poner los valores despues
+
+        try (Connection cn = Conexion.conectar(); PreparedStatement pst = cn.prepareStatement(sql)) {//preparamos la sentencia sql para q reciba los valores
+            //llenamos los ? con los datos ingresados por el usuario
+            pst.setString(1, IdProveedor);
+            pst.setString(2, nombre);
+            pst.setString(3, apellido);
+            pst.setLong(4, cedula);
+            pst.setLong(5, telefono);
+            pst.setString(6, empresa_proveedora);
+            pst.setInt(7, 1);  // Estado fijo en 1
+
+            //ejecutamos la inserccion y verificamos si se efectó alguna fila
+            int filasAfectadas = pst.executeUpdate();
+            //si se incertó correctamente, retorna true
+            return filasAfectadas > 0;
+        } catch (SQLException e) {
+            //si hay error, muestra un mensaje y retorna false
+            JOptionPane.showMessageDialog(null, " Error al crear proveedor: " + e.getMessage());
+            return false;
+        }
+    }
     }
 
-    public static void estiloBoton(JButton boton) {
-        boton.setBackground(new Color(173, 216, 230)); // Azul claro
-        boton.setForeground(Color.BLACK);
-        boton.setFocusPainted(false);
-        boton.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 2)); // Azul más oscuro
-        boton.setFont(new Font("Arial", Font.BOLD, 14));
-    }
-}

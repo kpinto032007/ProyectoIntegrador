@@ -6,6 +6,7 @@ import java.sql.*;
 public class gestionarProducto extends JFrame {
     private JTable tablaProductos;
     private DefaultTableModel modelo;
+    private JButton btnEditar, btnEliminar, btnVolver;
 
     public gestionarProducto() {
         setTitle("Gestión de Productos");
@@ -31,23 +32,25 @@ public class gestionarProducto extends JFrame {
         JScrollPane scrollPane = new JScrollPane(tablaProductos);
         add(scrollPane, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel();
-        JButton btnEditar = new JButton("Editar Producto");
-        JButton btnEliminar = new JButton("Eliminar Producto");
-        JButton btnRegresar = new JButton("Regresar al Menú");
-        buttonPanel.add(btnEditar);
-        buttonPanel.add(btnEliminar);
-        buttonPanel.add(btnRegresar);
-        add(buttonPanel, BorderLayout.SOUTH);
+        // Panel de botones
+        JPanel panelBotones = new JPanel();
+        btnEditar = new JButton("Editar");
+        btnEliminar = new JButton("Eliminar");
+        btnVolver = new JButton("Volver");
 
+
+        panelBotones.add(btnEditar);
+        panelBotones.add(btnEliminar);
+        panelBotones.add(btnVolver);
+
+        add(panelBotones, BorderLayout.SOUTH);
+
+        cargarProductos();
+
+        // Eventos
         btnEditar.addActionListener(e -> editarProducto());
         btnEliminar.addActionListener(e -> eliminarProducto());
-        btnRegresar.addActionListener(e -> {
-            dispose();
-            new Menu().setVisible(true);
-        });
-
-        setVisible(true);
+        btnVolver.addActionListener(e -> volver());
     }
 
     private JPanel crearPanelProductos() {
@@ -184,5 +187,28 @@ public class gestionarProducto extends JFrame {
                 JOptionPane.showMessageDialog(this, "Error al eliminar producto: " + e.getMessage());
             }
         }
+    }
+    private void volver() {
+        dispose();
+        new Menu();
+
+        String[] opciones = {"Crear Producto", "Gestionar Producto", "Cancelar"};
+        int opcion = JOptionPane.showOptionDialog(
+                null,
+                "Seleccione una opción:",
+                "Gestión de Productos",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                opciones,
+                opciones[0]
+        );
+
+        switch (opcion) {
+            case 0 -> new CrearProducto().setVisible(true);
+            case 1 -> new gestionarProducto().setVisible(true);
+            default -> { }
+        }// Cierra solo esta ventana
+
     }
 }

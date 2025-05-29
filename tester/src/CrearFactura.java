@@ -1,8 +1,6 @@
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.Connection;
@@ -101,7 +99,7 @@ import java.time.LocalDate;
 
                 switch (opcion) {
                     case 0 -> new CrearFactura().setVisible(true);
-                    case 1 -> new GestionarFactura().setVisible(true);
+                    case 1 -> new gestionarFactura().setVisible(true);
                     default -> { }
                 }
             });

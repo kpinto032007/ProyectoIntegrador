@@ -71,13 +71,6 @@ public class SignInUI {
         passwordField.addActionListener(e -> iniciarSesion(userField, passwordField, frame));
 
 
-        // Enlace de recuperación de contraseña
-        JLabel forgotPasswordLabel = new JLabel("¿Forgot your password?");
-        forgotPasswordLabel.setFont(new Font("Arial", Font.ITALIC, 12));
-        forgotPasswordLabel.setForeground(Color.WHITE);
-        gbc.gridy = 3;
-        rightPanel.add(forgotPasswordLabel, gbc);
-
         // Panel de botones
         JPanel buttonPanel = new JPanel();
         buttonPanel.setOpaque(false);

@@ -1,22 +1,19 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class GestionarFactura extends JFrame {
+public class gestionarFactura extends JFrame {
     private JTable tablaFacturas;
     private DefaultTableModel modelo;
     private JButton btnEditar, btnEliminar, btnExportarPDF, btnVolver;
 
-    public GestionarFactura() {
+    public gestionarFactura() {
         setTitle("Gestionar Facturas");
         setSize(600, 400);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
-        setVisible(true);
 
         // Modelo de la tabla
         modelo = new DefaultTableModel();
@@ -177,7 +174,7 @@ public class GestionarFactura extends JFrame {
 
     private void volver() {
         dispose();
-        new Menu();
+
 
         String[] opciones = {"Crear Factura", "Gestionar Facturas", "Cancelar"};
         int opcion = JOptionPane.showOptionDialog(
@@ -193,7 +190,7 @@ public class GestionarFactura extends JFrame {
 
         switch (opcion) {
             case 0 -> new CrearFactura().setVisible(true);
-            case 1 -> new GestionarFactura().setVisible(true);
+            case 1 -> new gestionarFactura().setVisible(true);
             default -> { }
         }// Cierra solo esta ventana
 

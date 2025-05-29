@@ -30,8 +30,8 @@ public class gestionarUsuario extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
-        JButton btnEditar = new JButton("Editar Usuario");
-        JButton btnEliminar = new JButton("Eliminar Usuario");
+        JButton btnEditar = new JButton("Editar");
+        JButton btnEliminar = new JButton("Eliminar");
         JButton btnRegresar = new JButton("Volver");
         buttonPanel.add(btnEditar);
         buttonPanel.add(btnEliminar);

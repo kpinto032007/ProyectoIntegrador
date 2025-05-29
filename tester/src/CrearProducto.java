@@ -16,8 +16,6 @@ public class CrearProducto extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;//los componentes ocupran todoo el ancho disponible
-
-
         // Título
         JLabel titleLabel = new JLabel("Crear Producto", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
@@ -119,9 +117,25 @@ public class CrearProducto extends JFrame {
 
         volver.addActionListener(e -> {
             frame.dispose(); // Cierra la ventana actual
-            new Menu();  // Abre la ventana de inicio de sesión
-        });
+              // Abre la ventana de inicio de sesión
+            String[] opciones= {" Crear producto", "Gestionar Producto", "Volver"};
+            int opcion = JOptionPane.showOptionDialog(
+                    null,
+                    "Seleccione una opción:",
+                    "Gestión de Productos",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    opciones,
+                    opciones[0]
+            );
+            switch (opcion) {
+                case 0 -> new CrearProducto().setVisible(true);
+                case 1 -> new gestionarProducto().setVisible(true);
+                default -> { }
+            }
 
+        });
         registerButton.addActionListener(e -> {
             String id= IdField.getText().trim();
             String nombre = nombreField.getText().trim();
@@ -133,7 +147,6 @@ public class CrearProducto extends JFrame {
                 JOptionPane.showMessageDialog(frame, "Por favor, completa todos los campos.");
                 return;
             }
-
             try {
                 long Cantidad = Long.parseLong(cantidad);  // Convierte a long
                 double Precio = Double.parseDouble(precio);
@@ -145,7 +158,6 @@ public class CrearProducto extends JFrame {
                     frame.dispose(); // Cierra la ventana después de registrar
 
 
-                    new Menu(); //con esta abro al menú
 
                 } else {
                     JOptionPane.showMessageDialog(frame, "Error al registrar usuario.");
@@ -155,7 +167,6 @@ public class CrearProducto extends JFrame {
                 // Si el usuario ingresa un valor no numérico, muestra un mensaje de error
                 JOptionPane.showMessageDialog(null, "Error: Ingresa solo números en Cantidad y Precio.", "Error de validación", JOptionPane.ERROR_MESSAGE);
             }
-
         });
     }
     public static boolean  CrearProducto(String id, String nombre, long cantidad, double precio, String descripcion){
