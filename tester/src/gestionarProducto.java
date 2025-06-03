@@ -190,7 +190,6 @@ public class gestionarProducto extends JFrame {
     }
     private void volver() {
         dispose();
-        new Menu();
 
         String[] opciones = {"Crear Producto", "Gestionar Producto", "Cancelar"};
         int opcion = JOptionPane.showOptionDialog(
