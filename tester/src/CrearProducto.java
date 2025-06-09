@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -7,118 +8,131 @@ import java.sql.SQLException;
 public class CrearProducto extends JFrame {
 
     public CrearProducto() {
-        JFrame frame = new JFrame("Crear producto");
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        frame.setSize(400,500);
-        frame.setLocationRelativeTo(null);
-        frame.setLayout(new GridBagLayout());
+        super("Crear Producto"); // Título del JFrame
+        setSize(400, 500);
+        setLocationRelativeTo(null);
+        setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;//los componentes ocupran todoo el ancho disponible
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
         // Título
         JLabel titleLabel = new JLabel("Crear Producto", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
-
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2;//ocupa dos columnas
-        frame.add(titleLabel, gbc);
+        gbc.gridwidth = 2;
+        add(titleLabel, gbc);
 
-        //Id producto
-        JLabel IdProductoLabel = new JLabel("Id Producto:");
+        // Campo ID
+        JLabel idProductoLabel = new JLabel("Id Producto:");
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
-        frame.add(IdProductoLabel, gbc);
+        add(idProductoLabel, gbc);
 
-        JTextField IdField = new JTextField(15); //ingresar el id
+        JTextField idField = new JTextField(15);
         gbc.gridx = 1;
-        frame.add(IdField, gbc); // al campo
+        add(idField, gbc);
 
-
-        //Nombre
-        JLabel nombreLabel = new JLabel("Nombre: ");
-        gbc.gridx =0;
-        gbc.gridy =2;
-        gbc.gridwidth = 1;
-        frame.add(nombreLabel,gbc);
-
+        // Campo Nombre
+        JLabel nombreLabel = new JLabel("Nombre:");
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        add(nombreLabel, gbc);
 
         JTextField nombreField = new JTextField();
-        gbc.gridx=1;
-        frame.add(nombreField,gbc);
-        IdField.addActionListener(e -> nombreField.requestFocusInWindow());
+        gbc.gridx = 1;
+        add(nombreField, gbc);
+        idField.addActionListener(e -> nombreField.requestFocusInWindow());
 
-
-        //Cantidad
-        JLabel cantidadLabel= new JLabel("Cantidad: ");
-        gbc.gridx= 0;
-        gbc.gridy= 3;
-        gbc.gridwidth =1;
-        frame.add(cantidadLabel,gbc);
+        // Campo Cantidad
+        JLabel cantidadLabel = new JLabel("Cantidad:");
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        add(cantidadLabel, gbc);
 
         JTextField cantidadField = new JTextField();
-        gbc.gridx= 1;
-        frame.add(cantidadField,gbc);
-        nombreField.addActionListener(e ->cantidadField.requestFocusInWindow());
+        gbc.gridx = 1;
+        add(cantidadField, gbc);
+        nombreField.addActionListener(e -> cantidadField.requestFocusInWindow());
 
-        //Precio
-        JLabel precioLabel= new JLabel("Precio: ");
-        gbc.gridx =0;
-        gbc.gridy =4;
-        gbc.gridwidth = 1;
-        frame.add(precioLabel,gbc);
-
+        // Campo Precio
+        JLabel precioLabel = new JLabel("Precio:");
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        add(precioLabel, gbc);
 
         JTextField precioField = new JTextField();
-        gbc.gridx=1;
-        frame.add(precioField,gbc);
+        gbc.gridx = 1;
+        add(precioField, gbc);
         cantidadField.addActionListener(e -> precioField.requestFocusInWindow());
 
-
-        JLabel descripcionLabel = new JLabel("Descripción: ");
+        // Campo Descripción
+        JLabel descripcionLabel = new JLabel("Descripción:");
         gbc.gridx = 0;
         gbc.gridy = 5;
-        gbc.gridwidth = 1;
-        frame.add(descripcionLabel, gbc);
+        add(descripcionLabel, gbc);
 
-        // Área de texto para Descripción
-        JTextArea descripcionField = new JTextArea(3, 20); // 3 filas, 20 columnas
+        JTextArea descripcionField = new JTextArea(3, 20);
         descripcionField.setLineWrap(true);
         descripcionField.setWrapStyleWord(true);
-
-
-        // Scroll para el área de texto
         JScrollPane scroll = new JScrollPane(descripcionField);
         gbc.gridx = 1;
-        gbc.gridwidth = 2; // Para que ocupe más espacio en la interfaz
-        frame.add(scroll, gbc);
+        gbc.gridwidth = 2;
+        add(scroll, gbc);
         precioField.addActionListener(e -> descripcionField.requestFocusInWindow());
 
-
-        frame.setVisible(true);
-
-        // Botón de registro
+        // Botón Registrar
         JButton registerButton = new JButton("Registrar");
         gbc.gridx = 0;
         gbc.gridy = 6;
         gbc.gridwidth = 2;
-        frame.add(registerButton, gbc);
+        add(registerButton, gbc);
 
-        // Botón "Volver"
+        // Botón Volver
         JButton volver = new JButton("Volver");
         gbc.gridx = 0;
-        gbc.gridy = 7; // Debe estar en la siguiente fila
+        gbc.gridy = 7;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(10, 0, 0, 0); // Margen superior
-        gbc.anchor = GridBagConstraints.CENTER; // Centrar el botón
-        frame.add(volver,gbc);
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(volver, gbc);
 
-        volver.addActionListener(e -> {
-            frame.dispose(); // Cierra la ventana actual
-              // Abre la ventana de inicio de sesión
-            String[] opciones= {" Crear producto", "Gestionar Producto", "Volver"};
+        // Acción Registrar
+        registerButton.addActionListener((ActionEvent e) -> {
+            String id = idField.getText().trim();
+            String nombre = nombreField.getText().trim();
+            String cantidad = cantidadField.getText().trim();
+            String precio = precioField.getText().trim();
+            String descripcion = descripcionField.getText().trim();
+
+            if (id.isEmpty() || nombre.isEmpty() || cantidad.isEmpty() || precio.isEmpty() || descripcion.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Por favor, completa todos los campos.");
+                return;
+            }
+
+            try {
+                long cantidadParseada = Long.parseLong(cantidad);
+                double precioParseado = Double.parseDouble(precio);
+
+                if (CrearProducto(id, nombre, cantidadParseada, precioParseado, descripcion)) {
+                    JOptionPane.showMessageDialog(this, "Registro exitoso");
+
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error al registrar el producto.");
+                }
+
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Error: Ingresa solo números en Cantidad y Precio.", "Error de validación", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Acción Volver
+        volver.addActionListener((ActionEvent e) -> {
+            dispose(); // Cierra esta ventana
+
+            String[] opciones = {"Crear producto", "Gestionar Producto", "Volver"};
             int opcion = JOptionPane.showOptionDialog(
                     null,
                     "Seleccione una opción:",
@@ -129,70 +143,35 @@ public class CrearProducto extends JFrame {
                     opciones,
                     opciones[0]
             );
+
             switch (opcion) {
-                case 0 -> new CrearProducto().setVisible(true);
+                case 0 -> new CrearProducto().setVisible(true); // Solo crea UNA nueva
                 case 1 -> new gestionarProducto().setVisible(true);
-                default -> { }
-            }
-
-        });
-        registerButton.addActionListener(e -> {
-            String id= IdField.getText().trim();
-            String nombre = nombreField.getText().trim();
-            String cantidad = cantidadField.getText().trim();
-            String precio = precioField.getText().trim();
-            String descripcion= descripcionField.getText().trim();
-
-            if (id.isEmpty() || nombre.isEmpty() || cantidad.isEmpty() || precio.isEmpty() || descripcion.isEmpty()) {
-                JOptionPane.showMessageDialog(frame, "Por favor, completa todos los campos.");
-                return;
-            }
-            try {
-                long Cantidad = Long.parseLong(cantidad);  // Convierte a long
-                double Precio = Double.parseDouble(precio);
-
-
-                //aqui llama a la funcion registrar usuarioven la base de datos
-                if (CrearProducto(id,nombre,Cantidad,Precio, descripcion)) {
-                    JOptionPane.showMessageDialog(frame, "Registro exitoso");
-                    frame.dispose(); // Cierra la ventana después de registrar
-
-
-
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Error al registrar usuario.");
-                }
-
-            } catch (NumberFormatException ex) {
-                // Si el usuario ingresa un valor no numérico, muestra un mensaje de error
-                JOptionPane.showMessageDialog(null, "Error: Ingresa solo números en Cantidad y Precio.", "Error de validación", JOptionPane.ERROR_MESSAGE);
+                default -> {} // No hacer nada
             }
         });
+
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setVisible(true);
     }
-    public static boolean  CrearProducto(String id, String nombre, long cantidad, double precio, String descripcion){
-        String sql = "INSERT INTO tb_productos (idProducto, nombre, cantidad, precio, descripcion, estado) VALUES (?, ?, ?, ?, ?,?)";
-        //proteger contra inyecciones sql y poner los valores despues
 
-        try (Connection cn = Conexion.conectar(); PreparedStatement pst = cn.prepareStatement(sql)) {//preparamos la sentencia sql para q reciba los valores
-            //llenamos los ? con los datos ingresados por el usuario
+    public static boolean CrearProducto(String id, String nombre, long cantidad, double precio, String descripcion) {
+        String sql = "INSERT INTO tb_productos (idProducto, nombre, cantidad, precio, descripcion, estado) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection cn = Conexion.conectar(); PreparedStatement pst = cn.prepareStatement(sql)) {
             pst.setString(1, id);
             pst.setString(2, nombre);
             pst.setLong(3, cantidad);
             pst.setDouble(4, precio);
             pst.setString(5, descripcion);
-            pst.setInt(6, 1);  // Estado fijo en 1
+            pst.setInt(6, 1); // Estado activo
 
-            //ejecutamos la inserccion y verificamos si se efectó alguna fila
             int filasAfectadas = pst.executeUpdate();
-            //si se incertó correctamente, retorna true
             return filasAfectadas > 0;
+
         } catch (SQLException e) {
-            //si hay error, muestra un mensaje y retorna false
-            JOptionPane.showMessageDialog(null, " Error al crear producto: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error al crear producto: " + e.getMessage());
             return false;
         }
     }
-
-
-    }
-
+}

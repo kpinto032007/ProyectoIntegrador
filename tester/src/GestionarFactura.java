@@ -17,10 +17,9 @@ public class gestionarFactura extends JFrame {
 
         // Modelo de la tabla
         modelo = new DefaultTableModel();
+        modelo.addColumn("ID Factura");
         modelo.addColumn("Fecha");
-        modelo.addColumn("Nombre Producto");
-        modelo.addColumn("Precio");
-        modelo.addColumn("Cantidad");
+        modelo.addColumn("Productos");
         modelo.addColumn("Total");
 
         tablaFacturas = new JTable(modelo);
@@ -52,24 +51,37 @@ public class gestionarFactura extends JFrame {
         btnVolver.addActionListener(e -> volver());
 
     }
-
     private void cargarFacturas() {
+
         try (Connection conn = Conexion.conectar()) {
-            String sql = "SELECT fecha, nombre, precio, cantidad, total_a_pagar FROM tb_facturas";
+            String sql = """
+            SELECT 
+                f.idFactura,
+                f.fecha,
+                GROUP_CONCAT(d.nombre SEPARATOR ', ') AS productos,
+                SUM(d.total_a_pagar) AS total_factura
+            FROM 
+                tb_facturas f
+            JOIN 
+                tb_detalle_factura d ON f.idFactura = d.idFactura
+            GROUP BY 
+                f.idFactura, f.fecha
+        """;
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 modelo.addRow(new Object[]{
+                        rs.getString("idFactura"),
                         rs.getString("fecha"),
-                        rs.getString("nombre"),
-                        rs.getDouble("precio"),
-                        rs.getInt("cantidad"),
-                        rs.getDouble("total_a_pagar")
+                        rs.getString("productos"),
+                        rs.getDouble("total_factura")
                 });
             }
+
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al cargar las facturas", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error al cargar las facturas: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
 
@@ -80,64 +92,99 @@ public class gestionarFactura extends JFrame {
             return;
         }
 
-        // Obtener valores de la tabla con el tipo correcto
-        String fecha = (String) modelo.getValueAt(filaSeleccionada, 0);
-        String nombreProducto = (String) modelo.getValueAt(filaSeleccionada, 1);
-        double precio = (Double) modelo.getValueAt(filaSeleccionada, 2);
-        int cantidad = (Integer) modelo.getValueAt(filaSeleccionada, 3);
-        double total = (Double) modelo.getValueAt(filaSeleccionada, 4);
+        // Obtener idFactura del modelo (columna 0)
+        int idFactura = Integer.parseInt(modelo.getValueAt(filaSeleccionada, 0).toString());
 
-        // Crear un panel de edición
-        JPanel panel = new JPanel(new GridLayout(0, 2));
-        JTextField tfFecha = new JTextField(fecha);
-        JTextField tfNombreProducto = new JTextField(nombreProducto);
-        JTextField tfPrecio = new JTextField(String.valueOf(precio));
-        JTextField tfCantidad = new JTextField(String.valueOf(cantidad));
-        JTextField tfTotal = new JTextField(String.valueOf(total));
+        try (Connection conn = Conexion.conectar()) {
+            // Obtener todos los detalles de la factura
+            String sqlDetalles = "SELECT * FROM tb_detalle_factura WHERE idFactura = ?";
+            PreparedStatement stmtDetalles = conn.prepareStatement(sqlDetalles);
+            stmtDetalles.setInt(1, idFactura);
+            ResultSet rsDetalles = stmtDetalles.executeQuery();
 
-        panel.add(new JLabel("Fecha:"));
-        panel.add(tfFecha);
-        panel.add(new JLabel("Nombre Producto:"));
-        panel.add(tfNombreProducto);
-        panel.add(new JLabel("Precio:"));
-        panel.add(tfPrecio);
-        panel.add(new JLabel("Cantidad:"));
-        panel.add(tfCantidad);
-        panel.add(new JLabel("Total:"));
-        panel.add(tfTotal);
+            DefaultTableModel modeloDetalles = new DefaultTableModel();
+            modeloDetalles.addColumn("ID Detalle");
+            modeloDetalles.addColumn("Nombre");
+            modeloDetalles.addColumn("Precio");
+            modeloDetalles.addColumn("Cantidad");
+            modeloDetalles.addColumn("Total");
 
-        int option = JOptionPane.showConfirmDialog(this, panel, "Editar Factura", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            // Validar y actualizar la factura
-            try (Connection conn = Conexion.conectar()) {
-                String sql = "UPDATE tb_facturas SET fecha = ?, nombre = ?, precio = ?, cantidad = ?, total_a_pagar = ? WHERE fecha = ? AND nombre = ?";
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setString(1, tfFecha.getText());
-                stmt.setString(2, tfNombreProducto.getText());
-                stmt.setDouble(3, Double.parseDouble(tfPrecio.getText()));
-                stmt.setInt(4, Integer.parseInt(tfCantidad.getText()));
-                stmt.setDouble(5, Double.parseDouble(tfTotal.getText()));
-                stmt.setString(6, fecha); // Fecha original como criterio de actualización
-                stmt.setString(7, nombreProducto); // Nombre del producto como criterio de actualización
-
-                int rowsUpdated = stmt.executeUpdate();
-                if (rowsUpdated > 0) {
-                    // Actualizar la tabla con los nuevos valores
-                    modelo.setValueAt(tfFecha.getText(), filaSeleccionada, 0);
-                    modelo.setValueAt(tfNombreProducto.getText(), filaSeleccionada, 1);
-                    modelo.setValueAt(Double.parseDouble(tfPrecio.getText()), filaSeleccionada, 2);
-                    modelo.setValueAt(Integer.parseInt(tfCantidad.getText()), filaSeleccionada, 3);
-                    modelo.setValueAt(Double.parseDouble(tfTotal.getText()), filaSeleccionada, 4);
-                    JOptionPane.showMessageDialog(this, "Factura actualizada correctamente");
-                } else {
-                    JOptionPane.showMessageDialog(this, "Error al actualizar la factura", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Error al editar la factura", "Error", JOptionPane.ERROR_MESSAGE);
+            while (rsDetalles.next()) {
+                modeloDetalles.addRow(new Object[]{
+                        rsDetalles.getInt("idDetalle"),
+                        rsDetalles.getString("nombre"),
+                        rsDetalles.getDouble("precio"),
+                        rsDetalles.getInt("cantidad"),
+                        rsDetalles.getDouble("total_a_pagar")
+                });
             }
+
+            JTable tablaDetalles = new JTable(modeloDetalles);
+            JScrollPane scrollPane = new JScrollPane(tablaDetalles);
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.add(new JLabel("Seleccione un producto para editar"), BorderLayout.NORTH);
+            panel.add(scrollPane, BorderLayout.CENTER);
+
+            int option = JOptionPane.showConfirmDialog(this, panel, "Editar Factura - Detalles", JOptionPane.OK_CANCEL_OPTION);
+            if (option == JOptionPane.OK_OPTION) {
+                int filaDetalle = tablaDetalles.getSelectedRow();
+                if (filaDetalle == -1) {
+                    JOptionPane.showMessageDialog(this, "Seleccione un producto para editar.");
+                    return;
+                }
+
+                int idDetalle = (int) modeloDetalles.getValueAt(filaDetalle, 0);
+                String nombre = (String) modeloDetalles.getValueAt(filaDetalle, 1);
+                double precio = (double) modeloDetalles.getValueAt(filaDetalle, 2);
+                int cantidad = (int) modeloDetalles.getValueAt(filaDetalle, 3);
+                double total = (double) modeloDetalles.getValueAt(filaDetalle, 4);
+
+                // Formulario de edición
+                JPanel formPanel = new JPanel(new GridLayout(0, 2));
+                JTextField tfNombre = new JTextField(nombre);
+                JTextField tfPrecio = new JTextField(String.valueOf(precio));
+                JTextField tfCantidad = new JTextField(String.valueOf(cantidad));
+
+                formPanel.add(new JLabel("Nombre:")); formPanel.add(tfNombre);
+                formPanel.add(new JLabel("Precio:")); formPanel.add(tfPrecio);
+                formPanel.add(new JLabel("Cantidad:")); formPanel.add(tfCantidad);
+
+                int editOption = JOptionPane.showConfirmDialog(this, formPanel, "Editar Producto", JOptionPane.OK_CANCEL_OPTION);
+                if (editOption == JOptionPane.OK_OPTION) {
+                    try {
+                        double nuevoPrecio = Double.parseDouble(tfPrecio.getText());
+                        int nuevaCantidad = Integer.parseInt(tfCantidad.getText());
+                        double nuevoTotal = nuevoPrecio * nuevaCantidad;
+
+                        String sqlActualizar = """
+                        UPDATE tb_detalle_factura
+                        SET nombre = ?, precio = ?, cantidad = ?, total_a_pagar = ?
+                        WHERE idDetalle = ?
+                    """;
+                        PreparedStatement stmtActualizar = conn.prepareStatement(sqlActualizar);
+                        stmtActualizar.setString(1, tfNombre.getText());
+                        stmtActualizar.setDouble(2, nuevoPrecio);
+                        stmtActualizar.setInt(3, nuevaCantidad);
+                        stmtActualizar.setDouble(4, nuevoTotal);
+                        stmtActualizar.setInt(5, idDetalle);
+                        stmtActualizar.executeUpdate();
+
+                        JOptionPane.showMessageDialog(this, "Producto actualizado correctamente");
+
+                        // Opcional: Recargar facturas para reflejar cambios
+                        modelo.setRowCount(0);
+                        cargarFacturas();
+
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(this, "Datos inválidos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al editar la factura: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
-
     private void eliminarFactura() {
         int filaSeleccionada = tablaFacturas.getSelectedRow();
         if (filaSeleccionada == -1) {
@@ -145,25 +192,44 @@ public class gestionarFactura extends JFrame {
             return;
         }
 
-        int confirmacion = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar la factura?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        int confirmacion = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar esta factura?", "Confirmar", JOptionPane.YES_NO_OPTION);
         if (confirmacion == JOptionPane.YES_OPTION) {
-            String fecha = (String) modelo.getValueAt(filaSeleccionada, 0);
-            String nombreProducto = (String) modelo.getValueAt(filaSeleccionada, 1);
-
             try (Connection conn = Conexion.conectar()) {
-                String sql = "DELETE FROM tb_facturas WHERE fecha = ? AND nombre = ?";
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setString(1, fecha);
-                stmt.setString(2, nombreProducto);
-                int rowsAffected = stmt.executeUpdate();
-                if (rowsAffected > 0) {
+                // Obtener idFactura desde la base de datos usando fecha y nombreProducto (si no lo guardaste)
+                String fecha = (String) modelo.getValueAt(filaSeleccionada, 0);
+                String nombreProducto = (String) modelo.getValueAt(filaSeleccionada, 1);
+
+                // Buscar idFactura (por ejemplo, usando la fecha)
+                String sqlIdFactura = "SELECT idFactura FROM tb_facturas WHERE fecha = ?";
+                PreparedStatement stmtId = conn.prepareStatement(sqlIdFactura);
+                stmtId.setString(1, fecha);
+                ResultSet rs = stmtId.executeQuery();
+
+                if (rs.next()) {
+                    int idFactura = rs.getInt("idFactura");
+
+                    // Eliminar detalle primero
+                    String sqlEliminarDetalle = "DELETE FROM tb_detalle_factura WHERE idFactura = ?";
+                    PreparedStatement stmtDetalle = conn.prepareStatement(sqlEliminarDetalle);
+                    stmtDetalle.setInt(1, idFactura);
+                    stmtDetalle.executeUpdate();
+
+                    // Eliminar factura principal
+                    String sqlEliminarFactura = "DELETE FROM tb_facturas WHERE idFactura = ?";
+                    PreparedStatement stmtFactura = conn.prepareStatement(sqlEliminarFactura);
+                    stmtFactura.setInt(1, idFactura);
+                    stmtFactura.executeUpdate();
+
+                    // Eliminar fila de la tabla
                     modelo.removeRow(filaSeleccionada);
+
                     JOptionPane.showMessageDialog(this, "Factura eliminada correctamente");
                 } else {
-                    JOptionPane.showMessageDialog(this, "No se encontró la factura para eliminar", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "No se encontró la factura.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Error al eliminar la factura", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error al eliminar la factura: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
             }
         }
     }

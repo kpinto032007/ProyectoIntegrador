@@ -4,6 +4,8 @@ import java.awt.*;
 import java.sql.*;
 
 public class gestionarProducto extends JFrame {
+
+
     private JTable tablaProductos;
     private DefaultTableModel modelo;
     private JButton btnEditar, btnEliminar, btnVolver;
@@ -26,7 +28,6 @@ public class gestionarProducto extends JFrame {
         modelo.addColumn("Descripción");
         modelo.addColumn("Estado");
 
-        cargarProductos();
 
         tablaProductos = new JTable(modelo);
         JScrollPane scrollPane = new JScrollPane(tablaProductos);
