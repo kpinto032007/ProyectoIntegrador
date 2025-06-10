@@ -29,5 +29,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="mysql-connector-java-5.1.46-bin" level="project" />
+    <orderEntry type="library" name="itextpdf" level="project" />
   </component>
 </module>

@@ -111,7 +111,7 @@ public class Menu extends JFrame {
             if (seleccion == 0) {
                 new CrearFactura().setVisible(true); // Asegúrate de que esta clase exista
             } else if (seleccion == 1) {
-                new gestionarFactura().setVisible(true);
+                new GestionarFactura().setVisible(true);
             }
         });
 

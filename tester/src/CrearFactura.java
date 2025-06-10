@@ -134,7 +134,7 @@ public class CrearFactura extends JFrame {
 
             switch (opcion) {
                 case 0 -> new CrearFactura().setVisible(true);
-                case 1 -> new gestionarFactura().setVisible(true);
+                case 1 -> new GestionarFactura().setVisible(true);
                 default -> {}
             }
         });

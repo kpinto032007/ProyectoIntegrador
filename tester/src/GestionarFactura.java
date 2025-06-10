@@ -2,13 +2,26 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.*;
+import java.io.FileOutputStream;
 
-public class gestionarFactura extends JFrame {
+import com.itextpdf.text.*;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.io.FileOutputStream;
+import javax.swing.JFileChooser;
+import com.itextpdf.text.pdf.draw.LineSeparator;
+
+
+
+
+public class GestionarFactura extends JFrame {
     private JTable tablaFacturas;
     private DefaultTableModel modelo;
     private JButton btnEditar, btnEliminar, btnExportarPDF, btnVolver;
 
-    public gestionarFactura() {
+    public GestionarFactura() {
         setTitle("Gestionar Facturas");
         setSize(600, 400);
         setLocationRelativeTo(null);
@@ -47,7 +60,18 @@ public class gestionarFactura extends JFrame {
         // Eventos
         btnEditar.addActionListener(e -> editarFactura());
         btnEliminar.addActionListener(e -> eliminarFactura());
-        btnExportarPDF.addActionListener(e -> exportarPDF());
+        btnExportarPDF.addActionListener(e -> {
+            int filaSeleccionada = tablaFacturas.getSelectedRow();
+            if (filaSeleccionada == -1) {
+                JOptionPane.showMessageDialog(this, "Seleccione una factura para exportar", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Suponiendo que el ID de la factura está en la columna 0
+            int idFactura = Integer.parseInt(tablaFacturas.getValueAt(filaSeleccionada, 0).toString());
+            exportarPDF(idFactura);
+        });
+
         btnVolver.addActionListener(e -> volver());
 
     }
@@ -192,76 +216,167 @@ public class gestionarFactura extends JFrame {
             return;
         }
 
-        int confirmacion = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar esta factura?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        // Obtener idFactura del modelo (columna 0)
+        int idFactura = Integer.parseInt(modelo.getValueAt(filaSeleccionada, 0).toString());
+
+        int confirmacion = JOptionPane.showConfirmDialog(
+                this,
+                "¿Está seguro de eliminar esta factura?",
+                "Confirmar Eliminación",
+                JOptionPane.YES_NO_OPTION
+        );
+
         if (confirmacion == JOptionPane.YES_OPTION) {
             try (Connection conn = Conexion.conectar()) {
-                // Obtener idFactura desde la base de datos usando fecha y nombreProducto (si no lo guardaste)
-                String fecha = (String) modelo.getValueAt(filaSeleccionada, 0);
-                String nombreProducto = (String) modelo.getValueAt(filaSeleccionada, 1);
 
-                // Buscar idFactura (por ejemplo, usando la fecha)
-                String sqlIdFactura = "SELECT idFactura FROM tb_facturas WHERE fecha = ?";
-                PreparedStatement stmtId = conn.prepareStatement(sqlIdFactura);
-                stmtId.setString(1, fecha);
-                ResultSet rs = stmtId.executeQuery();
+                // Eliminar primero los detalles de la factura
+                String sqlEliminarDetalle = "DELETE FROM tb_detalle_factura WHERE idFactura = ?";
+                PreparedStatement stmtDetalle = conn.prepareStatement(sqlEliminarDetalle);
+                stmtDetalle.setInt(1, idFactura);
+                stmtDetalle.executeUpdate();
 
-                if (rs.next()) {
-                    int idFactura = rs.getInt("idFactura");
+                // Luego eliminar la factura principal
+                String sqlEliminarFactura = "DELETE FROM tb_facturas WHERE idFactura = ?";
+                PreparedStatement stmtFactura = conn.prepareStatement(sqlEliminarFactura);
+                stmtFactura.setInt(1, idFactura);
+                stmtFactura.executeUpdate();
 
-                    // Eliminar detalle primero
-                    String sqlEliminarDetalle = "DELETE FROM tb_detalle_factura WHERE idFactura = ?";
-                    PreparedStatement stmtDetalle = conn.prepareStatement(sqlEliminarDetalle);
-                    stmtDetalle.setInt(1, idFactura);
-                    stmtDetalle.executeUpdate();
+                // Eliminar fila del modelo de la tabla
+                modelo.removeRow(filaSeleccionada);
 
-                    // Eliminar factura principal
-                    String sqlEliminarFactura = "DELETE FROM tb_facturas WHERE idFactura = ?";
-                    PreparedStatement stmtFactura = conn.prepareStatement(sqlEliminarFactura);
-                    stmtFactura.setInt(1, idFactura);
-                    stmtFactura.executeUpdate();
+                JOptionPane.showMessageDialog(this, "Factura eliminada correctamente");
 
-                    // Eliminar fila de la tabla
-                    modelo.removeRow(filaSeleccionada);
-
-                    JOptionPane.showMessageDialog(this, "Factura eliminada correctamente");
-                } else {
-                    JOptionPane.showMessageDialog(this, "No se encontró la factura.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, "Error al eliminar la factura: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
             }
         }
     }
+    private void exportarPDF(int idFactura) {
+        Document document = new Document(PageSize.A4, 50, 50, 50, 50);
+        try {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Guardar factura como PDF");
+            int userSelection = fileChooser.showSaveDialog(this);
 
-    private void exportarPDF() {
-        JOptionPane.showMessageDialog(this, "Funcionalidad de exportación a PDF en desarrollo");
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+                if (!filePath.toLowerCase().endsWith(".pdf")) {
+                    filePath += ".pdf";
+                }
+
+                PdfWriter.getInstance(document, new FileOutputStream(filePath));
+                document.open();
+
+                Font fontTitulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 22, BaseColor.BLACK);
+                Font fontSubtitulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY);
+                Font fontNormal = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.BLACK);
+
+                // ======= ENCABEZADO =======
+                Paragraph titulo = new Paragraph("FACTURA", fontTitulo);
+                titulo.setAlignment(Element.ALIGN_CENTER);
+                document.add(titulo);
+
+                document.add(new Paragraph(" "));
+
+                // Datos generales de la factura
+                try (Connection conn = Conexion.conectar();
+                     PreparedStatement ps = conn.prepareStatement("SELECT fecha FROM tb_facturas WHERE idFactura = ?")) {
+                    ps.setInt(1, idFactura);
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.next()) {
+                        String fecha = rs.getString("fecha");
+
+                        PdfPTable tablaCabecera = new PdfPTable(2);
+                        tablaCabecera.setWidthPercentage(100);
+                        tablaCabecera.setSpacingBefore(10f);
+                        tablaCabecera.setWidths(new float[]{1, 3});
+
+                        tablaCabecera.addCell(crearCeldaEtiqueta("Fecha:", fontSubtitulo));
+                        tablaCabecera.addCell(crearCeldaValor(fecha, fontNormal));
+
+                        tablaCabecera.addCell(crearCeldaEtiqueta("Factura N°:", fontSubtitulo));
+                        tablaCabecera.addCell(crearCeldaValor(String.valueOf(idFactura), fontNormal));
+
+                        document.add(tablaCabecera);
+                    }
+                }
+
+                document.add(new Paragraph(" "));
+
+                // ======= TABLA DE PRODUCTOS =======
+                PdfPTable tablaProductos = new PdfPTable(5);
+                tablaProductos.setWidthPercentage(100);
+                tablaProductos.setWidths(new float[]{3, 4, 2, 2, 2});
+
+                tablaProductos.addCell(crearCeldaEtiqueta("Producto", fontSubtitulo));
+                tablaProductos.addCell(crearCeldaEtiqueta("Descripción", fontSubtitulo));
+                tablaProductos.addCell(crearCeldaEtiqueta("Precio", fontSubtitulo));
+                tablaProductos.addCell(crearCeldaEtiqueta("Cantidad", fontSubtitulo));
+                tablaProductos.addCell(crearCeldaEtiqueta("Subtotal", fontSubtitulo));
+
+                double totalGeneral = 0.0;
+
+                try (Connection conn = Conexion.conectar();
+                     PreparedStatement ps = conn.prepareStatement("SELECT nombre, descripcion, precio, cantidad, total_a_pagar FROM tb_detalle_factura WHERE idFactura = ?")) {
+                    ps.setInt(1, idFactura);
+                    ResultSet rs = ps.executeQuery();
+
+                    while (rs.next()) {
+                        String nombre = rs.getString("nombre");
+                        String descripcion = rs.getString("descripcion");
+                        double precio = rs.getDouble("precio");
+                        int cantidad = rs.getInt("cantidad");
+                        double subtotal = rs.getDouble("total_a_pagar");
+                        totalGeneral += subtotal;
+
+                        tablaProductos.addCell(crearCeldaValor(nombre, fontNormal));
+                        tablaProductos.addCell(crearCeldaValor(descripcion, fontNormal));
+                        tablaProductos.addCell(crearCeldaValor(String.format("$%.2f", precio), fontNormal));
+                        tablaProductos.addCell(crearCeldaValor(String.valueOf(cantidad), fontNormal));
+                        tablaProductos.addCell(crearCeldaValor(String.format("$%.2f", subtotal), fontNormal));
+                    }
+                }
+
+                document.add(tablaProductos);
+
+                document.add(new Paragraph(" "));
+
+                // TOTAL GENERAL
+                Paragraph total = new Paragraph("Total a pagar: $" + String.format("%.2f", totalGeneral), fontSubtitulo);
+                total.setAlignment(Element.ALIGN_RIGHT);
+                document.add(total);
+
+                document.close();
+                JOptionPane.showMessageDialog(this, "Factura exportada exitosamente.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al exportar el PDF", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
+
+
+
+    private PdfPCell crearCeldaEtiqueta(String texto, Font font) {
+        PdfPCell celda = new PdfPCell(new Phrase(texto, font));
+        celda.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        celda.setHorizontalAlignment(Element.ALIGN_LEFT);
+        celda.setPadding(8);
+        return celda;
+    }
+
+    private PdfPCell crearCeldaValor(String texto, Font font) {
+        PdfPCell celda = new PdfPCell(new Phrase(texto, font));
+        celda.setHorizontalAlignment(Element.ALIGN_LEFT);
+        celda.setPadding(8);
+        return celda;
+    }
+
+
 
     private void volver() {
         dispose();
-
-
-        String[] opciones = {"Crear Factura", "Gestionar Facturas", "Cancelar"};
-        int opcion = JOptionPane.showOptionDialog(
-                null,
-                "Seleccione una opción:",
-                "Gestión de Facturas",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.INFORMATION_MESSAGE,
-                null,
-                opciones,
-                opciones[0]
-        );
-
-        switch (opcion) {
-            case 0 -> new CrearFactura().setVisible(true);
-            case 1 -> new gestionarFactura().setVisible(true);
-            default -> { }
-        }// Cierra solo esta ventana
-
     }
-
-
-
 }
