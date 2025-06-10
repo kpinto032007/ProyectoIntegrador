@@ -1,101 +1,142 @@
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.awt.event.*;
+import java.sql.*;
 
 public class SignInUI {
 
-    //este es el constructor que  inicializa
-    public SignInUI(){
+    public SignInUI() {
         createAndShowGUI();
     }
+
     public void createAndShowGUI() {
         JFrame frame = new JFrame("Sign In");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  // cierra la pestaña
-        frame.setSize(500, 500);  //establece el tamaño de la interfaz
-        frame.setLocationRelativeTo(null);           //la ubica al centro
-        frame.setLayout(new BorderLayout()); //divide en 5 areas
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(700, 500);
+        frame.setLocationRelativeTo(null);
 
-        // Panel izquierdo con color celeste
-        JPanel leftPanel = new JPanel();
-        leftPanel.setBackground(new Color(173, 216, 230));
-        leftPanel.setPreferredSize(new Dimension(200, frame.getHeight())); //para completar la pantalla
-        leftPanel.setLayout(new GridBagLayout());
-        frame.add(leftPanel, BorderLayout.WEST);
+        // Fondo general claro con color #EDE9E3
+        JPanel backgroundPanel = new JPanel();
+        backgroundPanel.setBackground(Color.decode("#EDE9E3"));
+        backgroundPanel.setLayout(new GridBagLayout());
 
-        // Logo de la aplicación
-        JLabel logoLabel = new JLabel("TECHSTOCK", SwingConstants.CENTER);
-        logoLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        leftPanel.add(logoLabel);
+        // Panel formulario translúcido con color #EDE9E3 y sombra marrón grisáceo
+        JPanel formPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Panel derecho con color azul oscuro
-        JPanel rightPanel = new JPanel();
-        rightPanel.setBackground(new Color(25, 55, 75));
-        rightPanel.setLayout(new GridBagLayout());
-        frame.add(rightPanel, BorderLayout.CENTER);
+                // Fondo translúcido beige claro (#EDE9E3)
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.85f));
+                g2.setColor(Color.decode("#EDE9E3"));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
 
+                // Sombra suave marrón grisáceo (#A38F85)
+                g2.setColor(new Color(163, 143, 133, 80)); // con alpha para sombra
+                g2.fillRoundRect(5, 5, getWidth(), getHeight(), 30, 30);
+                g2.dispose();
+
+                super.paintComponent(g);
+            }
+        };
+        formPanel.setOpaque(false);
+        formPanel.setLayout(new GridBagLayout());
+        formPanel.setPreferredSize(new Dimension(370, 340));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(15, 20, 15, 20);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Título SIGN IN
-        JLabel signInLabel = new JLabel("SIGN IN", SwingConstants.CENTER);
-        signInLabel.setFont(new Font("Serif", Font.BOLD, 24));
-        signInLabel.setForeground(Color.WHITE);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        rightPanel.add(signInLabel, gbc);
+        // Ícono usuario
+        JLabel userIcon = new JLabel(new ImageIcon(
+                new ImageIcon("src/imagenes/img.png").getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH)
+        ));
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1;
+        formPanel.add(userIcon, gbc);
 
-        // Campo de usuario
-        JTextField userField = new JTextField(" ");
-        userField.setPreferredSize(new Dimension(200, 30));
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        rightPanel.add(userField, gbc);
+        // Campo usuario
+        JTextField userField = new JTextField();
+        addPlaceholder(userField, "Usuario");
+        styleTextField(userField);
+        gbc.gridx = 1;
+        formPanel.add(userField, gbc);
 
-        // Campo de contraseña
+        // Ícono contraseña
+        JLabel passIcon = new JLabel(new ImageIcon(
+                new ImageIcon("src/imagenes/img_1.png").getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH)
+        ));
+        gbc.gridx = 0; gbc.gridy = 1;
+        formPanel.add(passIcon, gbc);
+
+        // Campo contraseña
         JPasswordField passwordField = new JPasswordField();
-        passwordField.setPreferredSize(new Dimension(200, 30));
-        gbc.gridy = 2;
-        rightPanel.add(passwordField, gbc);
+        addPlaceholder(passwordField, "Clave");
+        styleTextField(passwordField);
+        gbc.gridx = 1;
+        formPanel.add(passwordField, gbc);
 
-        // 🔹 Mover el foco con Enter en usuario
-        userField.addActionListener(e -> passwordField.requestFocusInWindow());
-        // 🔹 Iniciar sesión con Enter en la contraseña
-        passwordField.addActionListener(e -> iniciarSesion(userField, passwordField, frame));
+        // Botón login
+        JButton loginButton = new JButton("→");
+        styleButton(loginButton, Color.decode("#E7D7C9"), Color.decode("#000000"));
+        loginButton.setFont(new Font("SansSerif", Font.BOLD, 24));
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        formPanel.add(loginButton, gbc);
 
-
-        // Panel de botones
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setOpaque(false);
-
-
-
-        // Botón LOGIN
-        JButton loginButton = new JButton("LOGIN");
+        // Botón registro
         JButton signupButton = new JButton("SIGN UP");
-        buttonPanel.add(loginButton);
-        buttonPanel.add(signupButton);
+        styleButton(signupButton, Color.decode("#D4B2A7"), Color.decode("#000000"));
+        signupButton.setFont(new Font("SansSerif", Font.BOLD, 16));
+        signupButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        signupButton.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                signupButton.setBackground(Color.decode("#E7D7C9"));
+            }
+            public void mouseExited(MouseEvent e) {
+                signupButton.setBackground(Color.decode("#D4B2A7"));
+            }
+        });
+        gbc.gridy = 3;
+        formPanel.add(signupButton, gbc);
 
-
-        gbc.gridy = 4;
-        gbc.gridwidth = 2;
-        rightPanel.add(buttonPanel, gbc);
-
+        // Listeners
         loginButton.addActionListener(e -> iniciarSesion(userField, passwordField, frame));
-        signupButton.addActionListener(e ->{
-            frame.dispose(); // con esta cierro la ventana de sesión
-            new FormularioRegistrar(); //y con esta abro la ventana de registro
+        signupButton.addActionListener(e -> {
+            frame.dispose();
+            new FormularioRegistrar();
         });
 
+        userField.addActionListener(e -> passwordField.requestFocusInWindow());
+        passwordField.addActionListener(e -> iniciarSesion(userField, passwordField, frame));
+
+        backgroundPanel.add(formPanel);
+        frame.setContentPane(backgroundPanel);
         frame.setVisible(true);
     }
+
+    // Estilo campos de texto
+    private void styleTextField(JTextComponent field) {
+        field.setPreferredSize(new Dimension(180, 35));
+        field.setBackground(Color.decode("#EDE9E3"));
+        field.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.decode("#A38F85"), 2, true),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+        field.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        field.setForeground(Color.decode("#A38F85"));
+    }
+
+    // Estilo botones
+    private void styleButton(JButton button, Color bg, Color fg) {
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(Color.decode("#A38F85"), 2, true));
+        button.setBackground(bg);
+        button.setForeground(fg);
+        button.setPreferredSize(new Dimension(150, 40));
+    }
+
 
     private void iniciarSesion(JTextField userField, JPasswordField passwordField, JFrame frame) {
         String usuario = userField.getText().trim();
@@ -109,9 +150,8 @@ public class SignInUI {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-
-                frame.dispose(); // Cerrar la ventana de inicio
-                new Menu(); // Aquí debes abrir la ventana principal
+                frame.dispose();
+                new Menu();
             } else {
                 JOptionPane.showMessageDialog(frame, "Usuario o contraseña incorrectos");
             }
@@ -121,6 +161,27 @@ public class SignInUI {
         }
     }
 
+    // Método para agregar placeholder
+    private void addPlaceholder(JTextComponent field, String placeholder) {
+        field.setText(placeholder);
+        field.setForeground(Color.decode("#CDC6C3"));
 
+        field.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (field.getText().equals(placeholder)) {
+                    field.setText("");
+                    field.setForeground(Color.decode("#000000"));
+                }
+            }
 
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (field.getText().isEmpty()) {
+                    field.setText(placeholder);
+                    field.setForeground(Color.decode("#CDC6C3"));
+                }
+            }
+        });
+    }
 }

@@ -1,130 +1,173 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
-public class CrearProveedor extends JFrame{
+public class CrearProveedor extends JFrame {
 
     public CrearProveedor() {
-       JFrame frame = new JFrame("Crear proveedor");
+        // Configuración básica del JFrame
+        JFrame frame = new JFrame("Crear proveedor");
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        frame.setSize(400,500);
+        frame.setSize(450, 600);
         frame.setLocationRelativeTo(null);
         frame.setLayout(new GridBagLayout());
+        frame.setBackground(Color.decode("#B7A7A9")); // Granite como fondo general
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;//los componentes ocupran todoo el ancho disponible
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
         // Título
         JLabel titleLabel = new JLabel("Crear Proveedor", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
-
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        titleLabel.setForeground(Color.BLACK); // Texto blanco sobre fondo oscuro
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2;//ocupa dos columnas
+        gbc.gridwidth = 2;
         frame.add(titleLabel, gbc);
 
-        //Id producto
-        JLabel IdProductoLabel = new JLabel("Id Proveedor:");
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        frame.add(IdProductoLabel, gbc);
+        // Panel para campos con fondo beige
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(Color.decode("#F6ECE3")); // Beige
+        GridBagConstraints gbcForm = new GridBagConstraints();
+        gbcForm.insets = new Insets(8, 8, 8, 8);
+        gbcForm.fill = GridBagConstraints.HORIZONTAL;
 
-        JTextField IdField = new JTextField(15); //ingresar el id
-        gbc.gridx = 1;
-        frame.add(IdField, gbc); // al campo
+        // Campos de entrada
 
+        // Id Proveedor
+        JLabel idLabel = new JLabel("Id Proveedor:");
+        idLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        idLabel.setForeground(Color.BLACK);
+        gbcForm.gridx = 0;
+        gbcForm.gridy = 0;
+        formPanel.add(idLabel, gbcForm);
 
-        //Nombre
-        JLabel nombreLabel = new JLabel("Nombre: ");
-        gbc.gridx =0;
-        gbc.gridy =2;
-        gbc.gridwidth = 1;
-        frame.add(nombreLabel,gbc);
+        JTextField idField = new JTextField(15);
+        idField.setBackground(Color.WHITE);
+        idField.setForeground(Color.BLACK);
+        idField.setBorder(BorderFactory.createLineBorder(Color.decode("#91766E")));
+        gbcForm.gridx = 1;
+        formPanel.add(idField, gbcForm);
 
+        // Nombre
+        JLabel nombreLabel = new JLabel("Nombre:");
+        nombreLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        nombreLabel.setForeground(Color.BLACK);
+        gbcForm.gridx = 0;
+        gbcForm.gridy = 1;
+        formPanel.add(nombreLabel, gbcForm);
 
-        JTextField nombreField = new JTextField();
-        gbc.gridx=1;
-        frame.add(nombreField,gbc);
-        IdField.addActionListener(e -> nombreField.requestFocusInWindow());
+        JTextField nombreField = new JTextField(15);
+        nombreField.setBackground(Color.WHITE);
+        nombreField.setForeground(Color.BLACK);
+        nombreField.setBorder(BorderFactory.createLineBorder(Color.decode("#91766E")));
+        gbcForm.gridx = 1;
+        formPanel.add(nombreField, gbcForm);
+        idField.addActionListener(e -> nombreField.requestFocusInWindow());
 
+        // Apellido
+        JLabel apellidoLabel = new JLabel("Apellido:");
+        apellidoLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        apellidoLabel.setForeground(Color.BLACK);
+        gbcForm.gridx = 0;
+        gbcForm.gridy = 2;
+        formPanel.add(apellidoLabel, gbcForm);
 
-        //Apellido
-        JLabel apellidoLabel= new JLabel("Apellido: ");
-        gbc.gridx= 0;
-        gbc.gridy= 3;
-        gbc.gridwidth =1;
-        frame.add(apellidoLabel,gbc);
+        JTextField apellidoField = new JTextField(15);
+        apellidoField.setBackground(Color.WHITE);
+        apellidoField.setForeground(Color.BLACK);
+        apellidoField.setBorder(BorderFactory.createLineBorder(Color.decode("#91766E")));
+        gbcForm.gridx = 1;
+        formPanel.add(apellidoField, gbcForm);
+        nombreField.addActionListener(e -> apellidoField.requestFocusInWindow());
 
-        JTextField apellidoField = new JTextField();
-        gbc.gridx= 1;
-        frame.add(apellidoField,gbc);
-        nombreField.addActionListener(e ->apellidoField.requestFocusInWindow());
+        // Cédula
+        JLabel cedulaLabel = new JLabel("Cédula:");
+        cedulaLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cedulaLabel.setForeground(Color.BLACK);
+        gbcForm.gridx = 0;
+        gbcForm.gridy = 3;
+        formPanel.add(cedulaLabel, gbcForm);
 
-        //Cedula
-        JLabel cedulaLabel= new JLabel("Cédula: ");
-        gbc.gridx =0;
-        gbc.gridy =4;
-        gbc.gridwidth = 1;
-        frame.add(cedulaLabel,gbc);
-
-
-        JTextField cedulaField = new JTextField();
-        gbc.gridx=1;
-        frame.add(cedulaField,gbc);
+        JTextField cedulaField = new JTextField(15);
+        cedulaField.setBackground(Color.WHITE);
+        cedulaField.setForeground(Color.BLACK);
+        cedulaField.setBorder(BorderFactory.createLineBorder(Color.decode("#91766E")));
+        gbcForm.gridx = 1;
+        formPanel.add(cedulaField, gbcForm);
         apellidoField.addActionListener(e -> cedulaField.requestFocusInWindow());
 
+        // Teléfono
+        JLabel telefonoLabel = new JLabel("Teléfono:");
+        telefonoLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        telefonoLabel.setForeground(Color.BLACK);
+        gbcForm.gridx = 0;
+        gbcForm.gridy = 4;
+        formPanel.add(telefonoLabel, gbcForm);
 
-        JLabel telefonoLabel = new JLabel("Telefono: ");
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        gbc.gridwidth = 1;
-        frame.add(telefonoLabel, gbc);
-
-        JTextField telefonoField = new JTextField();
-        gbc.gridx=1;
-        frame.add(telefonoField,gbc);
+        JTextField telefonoField = new JTextField(15);
+        telefonoField.setBackground(Color.WHITE);
+        telefonoField.setForeground(Color.BLACK);
+        telefonoField.setBorder(BorderFactory.createLineBorder(Color.decode("#91766E")));
+        gbcForm.gridx = 1;
+        formPanel.add(telefonoField, gbcForm);
         cedulaField.addActionListener(e -> telefonoField.requestFocusInWindow());
 
-        //empresa proveedora
-        JLabel empresaLabel = new JLabel("Empresa Proveedora: ");
-        gbc.gridx = 0;
-        gbc.gridy = 6;
-        gbc.gridwidth = 1;
-        frame.add(empresaLabel, gbc);
+        // Empresa Proveedora
+        JLabel empresaLabel = new JLabel("Empresa:");
+        empresaLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        empresaLabel.setForeground(Color.BLACK);
+        gbcForm.gridx = 0;
+        gbcForm.gridy = 5;
+        formPanel.add(empresaLabel, gbcForm);
 
-        JTextField empresaField = new JTextField();
-        gbc.gridx=1;
-        frame.add(empresaField,gbc);
+        JTextField empresaField = new JTextField(15);
+        empresaField.setBackground(Color.WHITE);
+        empresaField.setForeground(Color.BLACK);
+        empresaField.setBorder(BorderFactory.createLineBorder(Color.decode("#91766E")));
+        gbcForm.gridx = 1;
+        formPanel.add(empresaField, gbcForm);
         telefonoField.addActionListener(e -> empresaField.requestFocusInWindow());
 
-
-        frame.setVisible(true);
-
-        // Botón de registro
-        JButton registerButton = new JButton("Registrar");
+        // Añadir panel al frame principal
         gbc.gridx = 0;
-        gbc.gridy = 7;
+        gbc.gridy = 1;
         gbc.gridwidth = 2;
+        frame.add(formPanel, gbc);
+
+        // Botón Registrar
+        JButton registerButton = new JButton("Registrar");
+        registerButton.setBackground(Color.decode("#91766E")); // Brown
+        registerButton.setForeground(Color.WHITE);
+        registerButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        registerButton.setFocusPainted(false);
+        registerButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
         frame.add(registerButton, gbc);
 
-        // Botón "Volver"
-        JButton volver = new JButton("Volver");
-        gbc.gridx = 0;
-        gbc.gridy = 8; // Debe estar en la siguiente fila
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(10, 0, 0, 0); // Margen superior
-        gbc.anchor = GridBagConstraints.CENTER; // Centrar el botón
-        frame.add(volver,gbc);
+        // Botón Volver
+        JButton volverButton = new JButton("Volver");
+        volverButton.setBackground(Color.decode("#B7A7A9")); // Granite
+        volverButton.setForeground(Color.BLACK);
+        volverButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        volverButton.setFocusPainted(false);
+        volverButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        gbc.gridy = 3;
+        frame.add(volverButton, gbc);
 
-        volver.addActionListener(e -> {
-            frame.dispose(); // Cierra la ventana actual
-            // Abre la ventana de inicio de sesión
-            String[] opciones= {" Crear proveedor", "Gestionar Proveedor", "Volver"};
+        // Acción botón Volver
+        volverButton.addActionListener(e -> {
+            frame.dispose();
+            String[] opciones = {"Crear proveedor", "Gestionar Proveedor", "Volver"};
             int opcion = JOptionPane.showOptionDialog(
                     null,
                     "Seleccione una opción:",
@@ -138,67 +181,63 @@ public class CrearProveedor extends JFrame{
             switch (opcion) {
                 case 0 -> new CrearProveedor().setVisible(true);
                 case 1 -> new gestionarProveedor().setVisible(true);
-                default -> { }
+                default -> {}
             }
-
         });
+
+        // Acción botón Registrar
         registerButton.addActionListener(e -> {
-            String IdProveedor= IdField.getText().trim();
+            String IdProveedor = idField.getText().trim();
             String nombre = nombreField.getText().trim();
             String apellido = apellidoField.getText().trim();
             String cedula = cedulaField.getText().trim();
             String telefono = telefonoField.getText().trim();
             String empresa_proveedora = empresaField.getText().trim();
 
-
             if (IdProveedor.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || cedula.isEmpty() || telefono.isEmpty() || empresa_proveedora.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Por favor, completa todos los campos.");
                 return;
             }
+
             try {
-                long Cedula = Long.parseLong(cedula);  // Convierte a long
+                long Cedula = Long.parseLong(cedula);
                 long Telefono = Long.parseLong(telefono);
 
-
-                //aqui llama a la funcion registrar usuarioven la base de datos
-                if (CrearProveedor(IdProveedor,nombre,apellido,Cedula,Telefono, empresa_proveedora)) {
+                if (CrearProveedor(IdProveedor, nombre, apellido, Cedula, Telefono, empresa_proveedora)) {
                     JOptionPane.showMessageDialog(frame, "Registro exitoso");
-                   // Cierra la ventana después de registrar
-
-
+                    frame.dispose();
                 } else {
-                    JOptionPane.showMessageDialog(frame, "Error al registrar usuario.");
+                    JOptionPane.showMessageDialog(frame, "Error al registrar proveedor.");
                 }
 
             } catch (NumberFormatException ex) {
-                // Si el usuario ingresa un valor no numérico, muestra un mensaje de error
-                JOptionPane.showMessageDialog(null, "Error: Ingresa solo números en Cedula y Telefono.", "Error de validación", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Error: Ingresa solo números en Cédula y Teléfono.", "Error de validación", JOptionPane.ERROR_MESSAGE);
             }
         });
-    }
-    public static boolean  CrearProveedor(String IdProveedor, String nombre, String apellido, long cedula, long telefono, String empresa_proveedora){
-        String sql = "INSERT INTO tb_proveedores (idProveedor, nombre, apellido, cedula, telefono, empresa_proveedora, estado) VALUES (?, ?, ?, ?, ?,?,?)";
-        //proteger contra inyecciones sql y poner los valores despues
 
-        try (Connection cn = Conexion.conectar(); PreparedStatement pst = cn.prepareStatement(sql)) {//preparamos la sentencia sql para q reciba los valores
-            //llenamos los ? con los datos ingresados por el usuario
+        frame.setVisible(true);
+    }
+
+    public static boolean CrearProveedor(String IdProveedor, String nombre, String apellido, long cedula, long telefono, String empresa_proveedora) {
+        String sql = "INSERT INTO tb_proveedores (idProveedor, nombre, apellido, cedula, telefono, empresa_proveedora, estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection cn = Conexion.conectar(); PreparedStatement pst = cn.prepareStatement(sql)) {
             pst.setString(1, IdProveedor);
             pst.setString(2, nombre);
             pst.setString(3, apellido);
             pst.setLong(4, cedula);
             pst.setLong(5, telefono);
             pst.setString(6, empresa_proveedora);
-            pst.setInt(7, 1);  // Estado fijo en 1
-
-            //ejecutamos la inserccion y verificamos si se efectó alguna fila
+            pst.setInt(7, 1);
             int filasAfectadas = pst.executeUpdate();
-            //si se incertó correctamente, retorna true
             return filasAfectadas > 0;
         } catch (SQLException e) {
-            //si hay error, muestra un mensaje y retorna false
-            JOptionPane.showMessageDialog(null, " Error al crear proveedor: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error al crear proveedor: " + e.getMessage());
             return false;
         }
     }
-    }
 
+    // Main para ejecutar
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new CrearProveedor().setVisible(true));
+    }
+}

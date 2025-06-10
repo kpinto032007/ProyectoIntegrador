@@ -15,77 +15,78 @@ public class CrearFactura extends JFrame {
 
     public CrearFactura() {
         setTitle("Crear Factura");
-        setSize(550, 650);
+        setSize(600, 700);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new GridBagLayout());
 
+        Color beige = Color.decode("#F6ECE3");
+        Color granite = Color.decode("#B7A7A9");
+        Color brown = Color.decode("#91766E");
+        Color white = Color.decode("#FFFFFF");
+        Color black = Color.decode("#000000");
+
+        getContentPane().setBackground(beige);
+
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 10, 5, 10);
+        gbc.insets = new Insets(8, 15, 8, 15);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        Font labelFont = new Font("SansSerif", Font.BOLD, 14);
+        Font fieldFont = new Font("SansSerif", Font.PLAIN, 13);
+
         // ======= Selección de producto =======
+        JLabel lblSeleccionar = new JLabel("Seleccionar Producto:");
+        lblSeleccionar.setFont(labelFont);
         gbc.gridx = 0; gbc.gridy = 0;
-        add(new JLabel("Seleccionar Producto:"), gbc);
+        add(lblSeleccionar, gbc);
 
         cmbProductos = new JComboBox<>();
-        gbc.gridx = 1; gbc.gridy = 0;
+        cmbProductos.setFont(fieldFont);
+        gbc.gridx = 1;
         add(cmbProductos, gbc);
 
-        btnAgregarProducto = new JButton("Agregar Producto");
+        btnAgregarProducto = new JButton("+ Agregar Producto");
+        estilizarBoton(btnAgregarProducto, brown, white);
         gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 2;
         add(btnAgregarProducto, gbc);
 
         modeloLista = new DefaultListModel<>();
         lstProductosSeleccionados = new JList<>(modeloLista);
+        lstProductosSeleccionados.setFont(fieldFont);
+        lstProductosSeleccionados.setBorder(BorderFactory.createLineBorder(granite));
+        JScrollPane scrollLista = new JScrollPane(lstProductosSeleccionados);
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1.0; gbc.weighty = 0.3;
-        add(new JScrollPane(lstProductosSeleccionados), gbc);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.BOTH; gbc.weightx = 1.0; gbc.weighty = 0.3;
+        add(scrollLista, gbc);
+        gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weighty = 0;
 
-        // ======= Detalles del producto =======
         gbc.gridwidth = 1;
 
-        gbc.gridx = 0; gbc.gridy = 3;
-        add(new JLabel("Fecha de emisión:"), gbc);
-        txtFecha = new JTextField(LocalDate.now().toString());
-        txtFecha.setEditable(false);
-        gbc.gridx = 1;
-        add(txtFecha, gbc);
+        agregarCampo("Fecha de emisión:", txtFecha = new JTextField(LocalDate.now().toString()), labelFont, fieldFont, false, gbc, 3);
+        agregarCampo("Nombre del producto:", txtNombre = new JTextField(), labelFont, fieldFont, true, gbc, 4);
 
-        gbc.gridx = 0; gbc.gridy = 4;
-        add(new JLabel("Nombre del producto:"), gbc);
-        txtNombre = new JTextField();
-        gbc.gridx = 1;
-        add(txtNombre, gbc);
-
+        JLabel lblDescripcion = new JLabel("Descripción:");
+        lblDescripcion.setFont(labelFont);
         gbc.gridx = 0; gbc.gridy = 5;
-        add(new JLabel("Descripción:"), gbc);
+        add(lblDescripcion, gbc);
         txtDescripcion = new JTextArea(3, 10);
+        txtDescripcion.setFont(fieldFont);
         JScrollPane scrollDescripcion = new JScrollPane(txtDescripcion);
         gbc.gridx = 1;
         add(scrollDescripcion, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 6;
-        add(new JLabel("Precio:"), gbc);
-        txtPrecio = new JTextField();
-        gbc.gridx = 1;
-        add(txtPrecio, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 7;
-        add(new JLabel("Cantidad:"), gbc);
-        txtCantidad = new JTextField("1");
-        gbc.gridx = 1;
-        add(txtCantidad, gbc);
+        agregarCampo("Precio:", txtPrecio = new JTextField(), labelFont, fieldFont, true, gbc, 6);
+        agregarCampo("Cantidad:", txtCantidad = new JTextField("1"), labelFont, fieldFont, true, gbc, 7);
 
         // ======= Botones =======
         btnGuardar = new JButton("Guardar Factura");
+        estilizarBoton(btnGuardar, granite, black);
         gbc.gridx = 0; gbc.gridy = 8; gbc.gridwidth = 2;
         add(btnGuardar, gbc);
 
         btnVolver = new JButton("Volver");
+        estilizarBoton(btnVolver, Color.GRAY, white);
         gbc.gridy = 9;
         add(btnVolver, gbc);
 
@@ -135,7 +136,6 @@ public class CrearFactura extends JFrame {
             switch (opcion) {
                 case 0 -> new CrearFactura().setVisible(true);
                 case 1 -> new GestionarFactura().setVisible(true);
-                default -> {}
             }
         });
 
@@ -144,6 +144,26 @@ public class CrearFactura extends JFrame {
         txtCantidad.addActionListener(e -> btnGuardar.requestFocusInWindow());
 
         getRootPane().setDefaultButton(btnGuardar);
+    }
+
+    private void agregarCampo(String etiqueta, JTextField campo, Font labelFont, Font fieldFont, boolean editable, GridBagConstraints gbc, int y) {
+        JLabel label = new JLabel(etiqueta);
+        label.setFont(labelFont);
+        gbc.gridx = 0; gbc.gridy = y;
+        add(label, gbc);
+
+        campo.setFont(fieldFont);
+        campo.setEditable(editable);
+        gbc.gridx = 1;
+        add(campo, gbc);
+    }
+
+    private void estilizarBoton(JButton boton, Color fondo, Color texto) {
+        boton.setFocusPainted(false);
+        boton.setBackground(fondo);
+        boton.setForeground(texto);
+        boton.setFont(new Font("SansSerif", Font.BOLD, 13));
+        boton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
     }
 
     private void cargarProductosDesdeBD() {
@@ -161,6 +181,7 @@ public class CrearFactura extends JFrame {
             JOptionPane.showMessageDialog(this, "Error al cargar productos: " + e.getMessage());
         }
     }
+
     private void guardarFactura() {
         if (modeloLista.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Debe seleccionar al menos un producto", "Error", JOptionPane.ERROR_MESSAGE);
@@ -173,7 +194,6 @@ public class CrearFactura extends JFrame {
         try (Connection conn = Conexion.conectar()) {
             conn.setAutoCommit(false);
 
-            // 1. Insertar en tb_facturas (cabecera) y obtener ID generado
             int idFacturaGenerado = -1;
             try (PreparedStatement psFactura = conn.prepareStatement(
                     "INSERT INTO tb_facturas (fecha, estado) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS)) {
@@ -189,7 +209,6 @@ public class CrearFactura extends JFrame {
                 }
             }
 
-            // 2. Insertar los productos en tb_detalle_factura
             for (int i = 0; i < modeloLista.getSize(); i++) {
                 String item = modeloLista.getElementAt(i);
                 String idProducto = item.split(" - ")[0];

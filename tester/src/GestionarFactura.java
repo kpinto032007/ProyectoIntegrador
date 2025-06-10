@@ -13,9 +13,6 @@ import java.io.FileOutputStream;
 import javax.swing.JFileChooser;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 
-
-
-
 public class GestionarFactura extends JFrame {
     private JTable tablaFacturas;
     private DefaultTableModel modelo;
@@ -36,8 +33,16 @@ public class GestionarFactura extends JFrame {
         modelo.addColumn("Total");
 
         tablaFacturas = new JTable(modelo);
+        tablaFacturas.setBackground(Color.decode("#F6ECE3")); //color beige
+        tablaFacturas.setForeground(Color.BLACK);
+        tablaFacturas.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 14));
+        tablaFacturas.setRowHeight(25);
+
         JScrollPane scrollPane = new JScrollPane(tablaFacturas);
         add(scrollPane, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        buttonPanel.setBackground(Color.decode("#B7A7A9"));
 
         // Panel de botones
         JPanel panelBotones = new JPanel();
@@ -74,6 +79,28 @@ public class GestionarFactura extends JFrame {
 
         btnVolver.addActionListener(e -> volver());
 
+
+
+    }
+    private JPanel crearPanelTitulo() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.decode("#91766E")); // Brown
+
+        JLabel titulo = new JLabel("Gestión de Proveedores", SwingConstants.CENTER);
+        titulo.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
+        titulo.setForeground(Color.WHITE);
+        panel.add(titulo, BorderLayout.CENTER);
+
+        return panel;
+    }
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setBackground(Color.decode("#91766E")); // Brown
+        button.setForeground(Color.WHITE);
+        button.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        return button;
     }
     private void cargarFacturas() {
 
@@ -137,7 +164,7 @@ public class GestionarFactura extends JFrame {
                 modeloDetalles.addRow(new Object[]{
                         rsDetalles.getInt("idDetalle"),
                         rsDetalles.getString("nombre"),
-                        rsDetalles.getDouble("precio"),
+                        rsDetalles.getDouble("Precio"),
                         rsDetalles.getInt("cantidad"),
                         rsDetalles.getDouble("total_a_pagar")
                 });

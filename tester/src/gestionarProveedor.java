@@ -1,78 +1,89 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.*;
 import java.sql.*;
 
 public class gestionarProveedor extends JFrame {
+
     private JTable tablaProveedores;
     private DefaultTableModel modelo;
 
     public gestionarProveedor() {
         setTitle("Gestión de Proveedor");
-        setSize(600, 400);
+        setSize(800, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
+        getContentPane().setBackground(Color.decode("#B7A7A9")); // Granite
 
-        JPanel panelUsuarios = crearPanelProveedor();
-        add(panelUsuarios, BorderLayout.NORTH);
+        JPanel panelTitulo = crearPanelTitulo();
+        add(panelTitulo, BorderLayout.NORTH);
 
         modelo = new DefaultTableModel();
         modelo.addColumn("ID");
         modelo.addColumn("Nombre");
         modelo.addColumn("Apellido");
-        modelo.addColumn("Cedula");
+        modelo.addColumn("Cédula");
         modelo.addColumn("Teléfono");
         modelo.addColumn("Empresa Proveedora");
         modelo.addColumn("Estado");
 
         tablaProveedores = new JTable(modelo);
+        tablaProveedores.setBackground(Color.decode("#F6ECE3")); // Beige
+        tablaProveedores.setForeground(Color.BLACK);
+        tablaProveedores.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        tablaProveedores.setRowHeight(25);
         JScrollPane scrollPane = new JScrollPane(tablaProveedores);
         add(scrollPane, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel();
-        JButton btnEditar = new JButton("Editar");
-        JButton btnEliminar = new JButton("Eliminar");
-        JButton btnRegresar = new JButton("Volver");
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        buttonPanel.setBackground(Color.decode("#B7A7A9"));
+
+        JButton btnEditar = createStyledButton("Editar");
+        JButton btnEliminar = createStyledButton("Eliminar");
+        JButton btnRegresar = createStyledButton("Volver");
+
+        btnEditar.addActionListener(e -> editarProveedor());
+        btnEliminar.addActionListener(e -> eliminarProveedor());
+        btnRegresar.addActionListener(e -> volver());
+
         buttonPanel.add(btnEditar);
         buttonPanel.add(btnEliminar);
         buttonPanel.add(btnRegresar);
+
         add(buttonPanel, BorderLayout.SOUTH);
 
         cargarProveedor();
-
-        btnEditar.addActionListener(e -> {
-            System.out.println("Botón de edición presionado");
-            editarProveedor();
-        });
-
-        btnEliminar.addActionListener(e -> {
-            System.out.println("Botón de eliminación presionado");
-            eliminarProveedor();
-        });
-
-        btnRegresar.addActionListener(e -> {volver();// Asegúrate de que esta línea crea y muestra la ventana del menú principal
-        });
-
         setVisible(true);
     }
 
-    private JPanel crearPanelProveedor() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+    private JPanel crearPanelTitulo() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.decode("#91766E")); // Brown
 
         JLabel titulo = new JLabel("Gestión de Proveedores", SwingConstants.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 20));
-        panel.add(titulo, BorderLayout.NORTH);
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titulo.setForeground(Color.WHITE);
+        panel.add(titulo, BorderLayout.CENTER);
 
         return panel;
+    }
+
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setBackground(Color.decode("#91766E")); // Brown
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        return button;
     }
 
     private void cargarProveedor() {
         try (Connection cn = Conexion.conectar();
              Statement stmt = cn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT idProveedor, nombre, apellido, cedula, telefono, empresa_proveedora, estado FROM tb_proveedores")) {
-
             while (rs.next()) {
                 Object[] fila = {
                         rs.getInt("idProveedor"),
@@ -85,24 +96,17 @@ public class gestionarProveedor extends JFrame {
                 };
                 modelo.addRow(fila);
             }
-
-            System.out.println("Proveedores cargados correctamente. Total: " + modelo.getRowCount());
-
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al cargar Proveedores: " + e.getMessage());
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al cargar proveedores: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void editarProveedor() {
-        System.out.println("Iniciando edición de proveedor");
         int filaSeleccionada = tablaProveedores.getSelectedRow();
         if (filaSeleccionada == -1) {
-            JOptionPane.showMessageDialog(this, "Seleccione un proveedor para editar", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Seleccione un proveedor para editar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-        System.out.println("Fila seleccionada: " + filaSeleccionada);
 
         String nombre = (String) modelo.getValueAt(filaSeleccionada, 1);
         String apellido = (String) modelo.getValueAt(filaSeleccionada, 2);
@@ -110,18 +114,20 @@ public class gestionarProveedor extends JFrame {
         String telefono = (String) modelo.getValueAt(filaSeleccionada, 4);
         String empresa_proveedora = (String) modelo.getValueAt(filaSeleccionada, 5);
         String estadoStr = (String) modelo.getValueAt(filaSeleccionada, 6);
-
-        // Convertir estado a entero (1 para Activo, 0 para Inactivo)
         int estado = estadoStr.equals("Activo") ? 1 : 0;
 
-        JPanel panel = new JPanel(new GridLayout(0, 2));
-        JTextField tfNombre = new JTextField(nombre);
-        JTextField tfApellido = new JTextField(apellido);
-        JTextField tfCedula = new JTextField(cedula);
-        JTextField tfTelefono = new JTextField(telefono);
-        JTextField tfEmpresa_Proveedora = new JTextField(empresa_proveedora);
+        JPanel panel = new JPanel(new GridLayout(0, 2, 10, 10));
+        panel.setBackground(Color.decode("#F6ECE3"));
+
+        JTextField tfNombre = createStyledTextField(nombre);
+        JTextField tfApellido = createStyledTextField(apellido);
+        JTextField tfCedula = createStyledTextField(cedula);
+        JTextField tfTelefono = createStyledTextField(telefono);
+        JTextField tfEmpresa = createStyledTextField(empresa_proveedora);
         JComboBox<String> cbEstado = new JComboBox<>(new String[]{"Activo", "Inactivo"});
         cbEstado.setSelectedItem(estadoStr);
+        cbEstado.setBackground(Color.WHITE);
+        cbEstado.setForeground(Color.BLACK);
 
         panel.add(new JLabel("Nombre:"));
         panel.add(tfNombre);
@@ -132,22 +138,31 @@ public class gestionarProveedor extends JFrame {
         panel.add(new JLabel("Teléfono:"));
         panel.add(tfTelefono);
         panel.add(new JLabel("Empresa Proveedora:"));
-        panel.add(tfEmpresa_Proveedora);
+        panel.add(tfEmpresa);
         panel.add(new JLabel("Estado:"));
         panel.add(cbEstado);
 
         int option = JOptionPane.showConfirmDialog(this, panel, "Editar Proveedor", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             try (Connection conn = Conexion.conectar()) {
-                String sql = "UPDATE tb_proveedores SET nombre = ?, apellido = ?, cedula = ?, telefono =?,  empresa_proveedora = ?, estado = ? WHERE idProveedor = ?";
+                String sql = "UPDATE tb_proveedores SET nombre = ?, apellido = ?, cedula = ?, telefono = ?, empresa_proveedora = ?, estado = ? WHERE idProveedor = ?";
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 stmt.setString(1, tfNombre.getText());
                 stmt.setString(2, tfApellido.getText());
                 stmt.setString(3, tfCedula.getText());
                 stmt.setString(4, tfTelefono.getText());
-                stmt.setString(5, tfEmpresa_Proveedora.getText());
+                stmt.setString(5, tfEmpresa.getText());
                 stmt.setInt(6, cbEstado.getSelectedItem().equals("Activo") ? 1 : 0);
-                stmt.setInt(7, (int) modelo.getValueAt(filaSeleccionada, 0));
+
+                Object idObj = modelo.getValueAt(filaSeleccionada, 0);
+                int idProveedor;
+                if (idObj instanceof Integer) {
+                    idProveedor = (Integer) idObj;
+                } else {
+                    idProveedor = Integer.parseInt(idObj.toString());
+                }
+
+                stmt.setInt(7, idProveedor);
 
                 int rowsUpdated = stmt.executeUpdate();
                 if (rowsUpdated > 0) {
@@ -155,64 +170,69 @@ public class gestionarProveedor extends JFrame {
                     modelo.setValueAt(tfApellido.getText(), filaSeleccionada, 2);
                     modelo.setValueAt(tfCedula.getText(), filaSeleccionada, 3);
                     modelo.setValueAt(tfTelefono.getText(), filaSeleccionada, 4);
-                    modelo.setValueAt(tfEmpresa_Proveedora.getText(), filaSeleccionada, 5);
+                    modelo.setValueAt(tfEmpresa.getText(), filaSeleccionada, 5);
                     modelo.setValueAt(cbEstado.getSelectedItem(), filaSeleccionada, 6);
-                    JOptionPane.showMessageDialog(this, "Proveedor actualizado correctamente");
+                    JOptionPane.showMessageDialog(this, "Proveedor actualizado correctamente.");
                 } else {
-                    JOptionPane.showMessageDialog(this, "Error al actualizar el Proveedor", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Error al actualizar el proveedor.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Error al editar el Proveedor: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error al editar proveedor: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
     private void eliminarProveedor() {
-        System.out.println("Botón de eliminar proveedor presionado");
-
         int filaSeleccionada = tablaProveedores.getSelectedRow();
         if (filaSeleccionada == -1) {
-            JOptionPane.showMessageDialog(this, "Seleccione un proveedor para eliminar", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Seleccione un proveedor para eliminar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        System.out.println("Fila seleccionada para eliminar: " + filaSeleccionada);
+        Object idObj = modelo.getValueAt(filaSeleccionada, 0);
+        int idProveedor;
+        if (idObj instanceof Integer) {
+            idProveedor = (Integer) idObj;
+        } else {
+            idProveedor = Integer.parseInt(idObj.toString());
+        }
 
-        int idProveedor = (int) modelo.getValueAt(filaSeleccionada, 0);
         String nombreProveedor = (String) modelo.getValueAt(filaSeleccionada, 1);
 
-        JPanel panel = new JPanel(new GridLayout(0, 2));
+        JPanel panel = new JPanel(new GridLayout(0, 2, 10, 10));
+        panel.setBackground(Color.decode("#F6ECE3"));
         panel.add(new JLabel("ID Proveedor:"));
         panel.add(new JLabel(String.valueOf(idProveedor)));
         panel.add(new JLabel("Nombre:"));
         panel.add(new JLabel(nombreProveedor));
 
-        int confirmacion = JOptionPane.showConfirmDialog(this, panel, "¿Está seguro de eliminar este proveedor?", JOptionPane.YES_NO_OPTION);
+        int confirmacion = JOptionPane.showConfirmDialog(
+                this,
+                panel,
+                "¿Está seguro de eliminar este proveedor?",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+
         if (confirmacion == JOptionPane.YES_OPTION) {
             try (Connection cn = Conexion.conectar();
                  PreparedStatement stmt = cn.prepareStatement("DELETE FROM tb_proveedores WHERE idProveedor = ?")) {
-
                 stmt.setInt(1, idProveedor);
-
                 int rowsDeleted = stmt.executeUpdate();
                 if (rowsDeleted > 0) {
                     modelo.removeRow(filaSeleccionada);
-                    JOptionPane.showMessageDialog(this, "Proveedor eliminado correctamente");
-                    System.out.println("Usuario eliminado: ID " + idProveedor);
+                    JOptionPane.showMessageDialog(this, "Proveedor eliminado correctamente.");
                 } else {
-                    JOptionPane.showMessageDialog(this, "Error al eliminar el Proveedor", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Error al eliminar el proveedor.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, "Error al eliminar proveedor: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                e.printStackTrace();
             }
         }
     }
 
     private void volver() {
         dispose();
-
         String[] opciones = {"Crear Proveedor", "Gestionar Proveedor", "Cancelar"};
         int opcion = JOptionPane.showOptionDialog(
                 null,
@@ -224,13 +244,22 @@ public class gestionarProveedor extends JFrame {
                 opciones,
                 opciones[0]
         );
-
         switch (opcion) {
-            case 0 -> new CrearProveedor().setVisible(true); /*.setVisible(true);*/
+            case 0 -> new CrearProveedor().setVisible(true);
             case 1 -> new gestionarProveedor().setVisible(true);
-            default -> {
-            }
-        }// Cierra solo esta ventana
+            default -> {}
+        }
+    }
+
+    private JTextField createStyledTextField(String text) {
+        JTextField field = new JTextField(text);
+        field.setBackground(Color.WHITE);
+        field.setForeground(Color.BLACK);
+        field.setBorder(BorderFactory.createLineBorder(Color.decode("#91766E")));
+        return field;
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new gestionarProveedor().setVisible(true));
     }
 }
-

@@ -1,24 +1,29 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.*;
 
 public class gestionarProducto extends JFrame {
-
-
     private JTable tablaProductos;
     private DefaultTableModel modelo;
     private JButton btnEditar, btnEliminar, btnVolver;
 
     public gestionarProducto() {
+
         setTitle("Gestión de Productos");
-        setSize(600, 400);
+        setSize(700, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JPanel panelProductos = crearPanelProductos();
-        add(panelProductos, BorderLayout.NORTH);
+        JPanel panelTitulo = new JPanel(new BorderLayout());
+        panelTitulo.setBackground(Color.decode("#91766E"));
+        JLabel titulo = new JLabel("Gestión de Productos", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 22));
+        titulo.setForeground(Color.WHITE);
+        panelTitulo.add(titulo, BorderLayout.CENTER);
+        add(panelTitulo, BorderLayout.NORTH);
 
         modelo = new DefaultTableModel();
         modelo.addColumn("ID");
@@ -28,65 +33,72 @@ public class gestionarProducto extends JFrame {
         modelo.addColumn("Descripción");
         modelo.addColumn("Estado");
 
-
         tablaProductos = new JTable(modelo);
+        tablaProductos.setBackground(Color.decode("#F6ECE3"));
+        tablaProductos.setFont(new Font("Arial", Font.PLAIN, 14));
+        tablaProductos.setRowHeight(25);
+
+        // Encabezados
+        tablaProductos.getTableHeader().setBackground(Color.decode("#B7A7A9"));
+        tablaProductos.getTableHeader().setForeground(Color.BLACK);
+        tablaProductos.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
+
+        // Alineación centrada
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        for (int i = 0; i < tablaProductos.getColumnCount(); i++) {
+            tablaProductos.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+
         JScrollPane scrollPane = new JScrollPane(tablaProductos);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Panel de botones
         JPanel panelBotones = new JPanel();
+        panelBotones.setBackground(Color.decode("#B7A7A9"));
+
         btnEditar = new JButton("Editar");
         btnEliminar = new JButton("Eliminar");
         btnVolver = new JButton("Volver");
 
-
-        panelBotones.add(btnEditar);
-        panelBotones.add(btnEliminar);
-        panelBotones.add(btnVolver);
+        JButton[] botones = {btnEditar, btnEliminar, btnVolver};
+        for (JButton btn : botones) {
+            btn.setBackground(Color.decode("#91766E"));
+            btn.setForeground(Color.WHITE);
+            btn.setFocusPainted(false);
+            btn.setFont(new Font("Arial", Font.BOLD, 14));
+            btn.setPreferredSize(new Dimension(100, 35));
+            panelBotones.add(btn);
+        }
 
         add(panelBotones, BorderLayout.SOUTH);
 
         cargarProductos();
 
-        // Eventos
         btnEditar.addActionListener(e -> editarProducto());
         btnEliminar.addActionListener(e -> eliminarProducto());
         btnVolver.addActionListener(e -> volver());
     }
 
-    private JPanel crearPanelProductos() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-
-        JLabel titulo = new JLabel("Gestión de Productos", SwingConstants.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 20));
-        panel.add(titulo, BorderLayout.NORTH);
-
-        return panel;
-    }
-
     private void cargarProductos() {
+
         try (Connection cn = Conexion.conectar();
              Statement stmt = cn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT idProducto, nombre, cantidad, precio, descripcion, estado FROM tb_productos")) {
 
             while (rs.next()) {
                 Object[] fila = {
-                        rs.getString("idProducto"),  // Ahora obtiene el ID como String en lugar de Int
+                        rs.getString("idProducto"),
                         rs.getString("nombre"),
                         rs.getInt("cantidad"),
                         rs.getDouble("precio"),
                         rs.getString("descripcion"),
-                        rs.getBoolean("estado") ? "Activo" : "Inactivo"
+                        (rs.getInt("estado") == 1) ? "Activo" : "Inactivo"
                 };
                 modelo.addRow(fila);
             }
 
-            System.out.println("Productos cargados correctamente. Total: " + modelo.getRowCount());
-
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error al cargar productos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         }
     }
 
@@ -97,14 +109,12 @@ public class gestionarProducto extends JFrame {
             return;
         }
 
-        String idProducto = (String) modelo.getValueAt(filaSeleccionada, 0); // ID como String
+        String idProducto = (String) modelo.getValueAt(filaSeleccionada, 0);
         String nombre = (String) modelo.getValueAt(filaSeleccionada, 1);
         int cantidad = (int) modelo.getValueAt(filaSeleccionada, 2);
         double precio = (double) modelo.getValueAt(filaSeleccionada, 3);
         String descripcion = (String) modelo.getValueAt(filaSeleccionada, 4);
         String estadoStr = (String) modelo.getValueAt(filaSeleccionada, 5);
-
-        int estado = estadoStr.equals("Activo") ? 1 : 0;
 
         JPanel panel = new JPanel(new GridLayout(0, 2));
         JTextField tfNombre = new JTextField(nombre);
@@ -135,7 +145,7 @@ public class gestionarProducto extends JFrame {
                 stmt.setDouble(3, Double.parseDouble(tfPrecio.getText()));
                 stmt.setString(4, tfDescripcion.getText());
                 stmt.setInt(5, cbEstado.getSelectedItem().equals("Activo") ? 1 : 0);
-                stmt.setString(6, idProducto); // Corrección: ID ahora se trata como String
+                stmt.setString(6, idProducto);
 
                 int rowsUpdated = stmt.executeUpdate();
                 if (rowsUpdated > 0) {
@@ -161,7 +171,7 @@ public class gestionarProducto extends JFrame {
             return;
         }
 
-        String idProducto = (String) modelo.getValueAt(filaSeleccionada, 0); // Corrección: ID como String
+        String idProducto = (String) modelo.getValueAt(filaSeleccionada, 0);
         String nombreProducto = (String) modelo.getValueAt(filaSeleccionada, 1);
 
         JPanel panel = new JPanel(new GridLayout(0, 2));
@@ -175,7 +185,7 @@ public class gestionarProducto extends JFrame {
             try (Connection cn = Conexion.conectar();
                  PreparedStatement stmt = cn.prepareStatement("DELETE FROM tb_productos WHERE idProducto = ?")) {
 
-                stmt.setString(1, idProducto); // Corrección: ID como String
+                stmt.setString(1, idProducto);
 
                 int rowsDeleted = stmt.executeUpdate();
                 if (rowsDeleted > 0) {
@@ -189,9 +199,9 @@ public class gestionarProducto extends JFrame {
             }
         }
     }
+
     private void volver() {
         dispose();
-
         String[] opciones = {"Crear Producto", "Gestionar Producto", "Cancelar"};
         int opcion = JOptionPane.showOptionDialog(
                 null,
@@ -207,8 +217,8 @@ public class gestionarProducto extends JFrame {
         switch (opcion) {
             case 0 -> new CrearProducto().setVisible(true);
             case 1 -> new gestionarProducto().setVisible(true);
-            default -> { }
-        }// Cierra solo esta ventana
-
+            default -> {
+            }
+        }
     }
 }
